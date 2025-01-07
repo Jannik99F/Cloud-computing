@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    container_name: webshop-backend
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
