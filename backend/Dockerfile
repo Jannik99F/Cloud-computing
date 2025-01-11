@@ -2,12 +2,11 @@ FROM python:3.10-slim
 
 WORKDIR /backend/app
 
-RUN pip install fastapi uvicorn
+RUN pip install --no-cache-dir fastapi uvicorn psycopg2-binary alembic sqlmodel python-dotenv
 
-CMD uvicorn pip install fastapi
-
-COPY app /backend/app
+COPY ./app /backend/app
 
 EXPOSE 8000
 
-CMD uvicorn hello:app --host 0.0.0.0 --port 8000
+# Define the command to run when the container starts
+CMD ["uvicorn", "hello:app", "--host", "0.0.0.0", "--port", "8000"]

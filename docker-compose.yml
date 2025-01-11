@@ -1,5 +1,17 @@
 services:
-  backend:
+  db:
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shop
+    ports:
+      - "5432:5432"
+    networks:
+      - webshop-network
+
+  webshop:
     build: backend
     container_name: webshop-backend
     working_dir: /backend/app
@@ -7,3 +19,16 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/backend/app
+    environment:  # for some reason I need to add it here again. Normally, this should work out of the box via the
+                  # python import of the .env but in the container for some reason it doesn't. But it should be finde
+                  # because this keeps the credentials locally in the .env.
+      DB_URL_PROD: ${DB_URL_PROD}
+      DB_URL_LOCAL: ${DB_URL_LOCAL}
+    depends_on:
+      - db
+    networks:
+      - webshop-network
+
+networks:
+  webshop-network:
+    driver: bridge
