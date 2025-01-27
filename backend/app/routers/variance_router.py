@@ -1,5 +1,6 @@
 from sqlmodel import Session, SQLModel, select
 from models.variance import Variance
+from models.product import Product
 
 from db.engine import DatabaseManager
 
@@ -39,6 +40,11 @@ async def create_variance(request: Request):
     price = user_data.get("price")
 
     with DatabaseManager.get_session() as session:
+        product_exists = session.exec(select(Product).where(Product.id == product_id)).first()
+
+        if not product_exists:
+            raise HTTPException(status_code=404, detail=f"Product with id {product_id} not found.")
+
         new_variance = Variance(
             product_id=product_id,
             name=name,
@@ -53,7 +59,7 @@ async def create_variance(request: Request):
     return {"variance": new_variance.dict()}
 
 @router.patch("/{variance_id}")
-async def update_user(variance_id: int, request: Request):
+async def update_variance(variance_id: int, request: Request):
     data = await request.json()
 
     with DatabaseManager.get_session() as session:
@@ -62,6 +68,9 @@ async def update_user(variance_id: int, request: Request):
 
         if variance is None:
             raise HTTPException(status_code=404, detail="Variance not found.")
+
+        if "product_id" in data:
+            raise HTTPException(status_code=400, detail="product_id cannot be updated.")
 
         for key, value in data.items():
             if value is not None and hasattr(variance, key):
@@ -73,6 +82,7 @@ async def update_user(variance_id: int, request: Request):
         session.refresh(variance)
 
     return {"variance": variance.dict()}
+
 
 
 @router.delete("/{variance_id}")
