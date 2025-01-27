@@ -1,4 +1,5 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+from typing import Optional
 
 class Variance(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -6,3 +7,4 @@ class Variance(SQLModel, table=True):
     name: str
     variance_type: str
     price: float
+    product: Optional["Product"] = Relationship(back_populates="variances")

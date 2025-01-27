@@ -1,4 +1,5 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+from typing import List
 
 class Product(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -9,3 +10,4 @@ class Product(SQLModel, table=True):
     height: float
     width: float
     depth: float
+    variances: List["Variance"] = Relationship(back_populates="product")
