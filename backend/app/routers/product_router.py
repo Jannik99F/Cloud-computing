@@ -13,11 +13,16 @@ router = APIRouter(
 
 @router.get("/")
 def get_all_products(session: Session = Depends(get_session)):
-    # Now the session is automatically passed to the function
     statement = select(Product).options(selectinload(Product.variances))
     products = session.exec(statement).all()
 
-    return {"products": [product.dict() for product in products]}
+    products_data = []
+    for product in products:
+        product_data = product.dict()  # Get product data
+        product_data['variances'] = [variance.dict() for variance in product.variances]
+        products_data.append(product_data)
+
+    return {"products": products_data}
 
 @router.get("/{product_id}")
 def get_product_by_id(product_id: int, session: Session = Depends(get_session)):
