@@ -18,3 +18,6 @@ class DatabaseManager:
     @staticmethod
     def get_session():
         return Session(DatabaseManager._engine)
+
+def get_session() -> Session:
+    return DatabaseManager.get_session()
