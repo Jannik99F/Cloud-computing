@@ -1,7 +1,8 @@
 from sqlmodel import Field, SQLModel, Relationship
 from typing import List
+from models.base_model import BaseModel
 
-class Product(SQLModel, table=True):
+class Product(BaseModel, table=True):
     id: int = Field(default=None, primary_key=True)
     base_price: float
     name: str
