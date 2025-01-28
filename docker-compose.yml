@@ -13,7 +13,7 @@ services:
 
   webshop:
     build: backend
-    container_name: webshop-backend
+    #container_name: webshop-backend
     working_dir: /backend/app
     ports:
       - "8000:8000"
@@ -26,6 +26,21 @@ services:
       DB_URL_LOCAL: ${DB_URL_LOCAL}
     depends_on:
       - db
+    networks:
+      - webshop-network
+
+  frontend:
+    build:
+      context: frontend/vue-project  # Path to frontend Dockerfile
+      dockerfile: Dockerfile
+    container_name: webshop-frontend
+    ports:
+      - "5173:5173"  # Vite default port
+    volumes:
+      - ./frontend/vue-project:/app  # Mount source code
+      - /app/node_modules  # Keep container dependencies isolated
+    depends_on:
+      - webshop  # Start after backend
     networks:
       - webshop-network
 
