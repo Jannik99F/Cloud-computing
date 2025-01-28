@@ -15,7 +15,7 @@ def get_all_users(session: Session = Depends(get_session)):
     statement = select(User)
     users = session.exec(statement).all()
 
-    return {"users": users}
+    return users
 
 @router.get("/{user_id}")
 def get_user_by_id(user_id: int, session: Session = Depends(get_session)):
@@ -25,7 +25,7 @@ def get_user_by_id(user_id: int, session: Session = Depends(get_session)):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    return {"user": user}
+    return user
 
 @router.post("/")
 async def create_user(request: Request, session: Session = Depends(get_session)):
@@ -49,7 +49,7 @@ async def create_user(request: Request, session: Session = Depends(get_session))
 
     session.refresh(new_user)
 
-    return {"user": new_user.dict()}
+    return new_user
 
 @router.patch("/{user_id}")
 async def update_user(user_id: int, request: Request, session: Session = Depends(get_session)):
@@ -70,7 +70,7 @@ async def update_user(user_id: int, request: Request, session: Session = Depends
 
     session.refresh(user)
 
-    return {"user": user.dict()}
+    return user
 
 
 @router.delete("/{user_id}")
