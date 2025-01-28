@@ -23,11 +23,7 @@ def get_all_variances(session: Session = Depends(get_session)):
 
 @router.get("/{variance_id}")
 def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)):
-    statement = (
-        select(Variance)
-        .options(selectinload(Variance.product))
-        .where(Variance.id == variance_id)
-    )
+    statement = select(Variance).where(Variance.id == variance_id)
     variance = session.exec(statement).first()
 
     if variance is None:
