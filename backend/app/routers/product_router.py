@@ -1,6 +1,7 @@
 from sqlmodel import Session, SQLModel, select
 from models.product import Product
 from sqlalchemy.orm import selectinload
+from typing import List
 
 from db.engine import DatabaseManager, get_session
 
@@ -18,7 +19,7 @@ def get_all_products(session: Session = Depends(get_session)):
 
     products_data = []
     for product in products:
-        product_data = product.dict()  # Get product data
+        product_data = product.dict()
         product_data['variances'] = [variance.dict() for variance in product.variances]
         products_data.append(product_data)
 
