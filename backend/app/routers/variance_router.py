@@ -1,6 +1,7 @@
 from sqlmodel import Session, SQLModel, select
 from models.variance import Variance
 from models.product import Product
+from sqlalchemy.orm import selectinload
 
 from db.engine import DatabaseManager, get_session
 
@@ -18,15 +19,19 @@ def get_all_variances(session: Session = Depends(get_session)):
 
     return {"variances": variances}
 
-@router.get("/{variance_id}")
+@router.get("/{variance_id}", response_model=Variance)
 def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)):
-    statement = select(Variance).where(Variance.id == variance_id)
+    statement = (
+        select(Variance)
+        .options(selectinload(Variance.product))  # Eagerly load variances
+        .where(Variance.id == variance_id)
+    )
     variance = session.exec(statement).first()
 
     if variance is None:
         raise HTTPException(status_code=404, detail="Variance not found.")
 
-    return {"variance": variance}
+    return variance
 
 @router.post("/")
 async def create_variance(request: Request, session: Session = Depends(get_session)):
