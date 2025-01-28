@@ -1,7 +1,6 @@
 from sqlmodel import Session, SQLModel, select
 from models.product import Product
 from sqlalchemy.orm import selectinload
-from typing import List
 
 from db.engine import DatabaseManager, get_session
 
@@ -17,13 +16,9 @@ def get_all_products(session: Session = Depends(get_session)):
     statement = select(Product).options(selectinload(Product.variances))
     products = session.exec(statement).all()
 
-    products_data = []
-    for product in products:
-        product_data = product.dict()
-        product_data['variances'] = [variance.dict() for variance in product.variances]
-        products_data.append(product_data)
+    products = [product.load_relations(relations_to_load=["variances"]) for product in products]
 
-    return {"products": products_data}
+    return products
 
 @router.get("/{product_id}")
 def get_product_by_id(product_id: int, session: Session = Depends(get_session)):
@@ -33,7 +28,7 @@ def get_product_by_id(product_id: int, session: Session = Depends(get_session)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found.")
 
-    return {"product": product}
+    return product.load_relations(relations_to_load=["variances"])
 
 @router.post("/")
 async def create_product(request: Request, session: Session = Depends(get_session)):
@@ -61,7 +56,7 @@ async def create_product(request: Request, session: Session = Depends(get_sessio
 
     session.refresh(new_product)
 
-    return {"product": new_product.dict()}
+    return new_product.load_relations(relations_to_load=["variances"])
 
 @router.patch("/{product_id}")
 async def update_product(product_id: int, request: Request, session: Session = Depends(get_session)):
@@ -82,7 +77,7 @@ async def update_product(product_id: int, request: Request, session: Session = D
 
     session.refresh(product)
 
-    return {"product": product.dict()}
+    return product.load_relations(relations_to_load=["variances"])
 
 @router.delete("/{product_id}")
 def delete_product(product_id: int, session: Session = Depends(get_session)):

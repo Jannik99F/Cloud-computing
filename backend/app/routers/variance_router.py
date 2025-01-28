@@ -17,13 +17,15 @@ def get_all_variances(session: Session = Depends(get_session)):
     statement = select(Variance)
     variances = session.exec(statement).all()
 
-    return {"variances": variances}
+    variances = [variance.load_relations(relations_to_load=["product"]) for variance in variances]
 
-@router.get("/{variance_id}", response_model=Variance)
+    return variances
+
+@router.get("/{variance_id}")
 def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)):
     statement = (
         select(Variance)
-        .options(selectinload(Variance.product))  # Eagerly load variances
+        .options(selectinload(Variance.product))
         .where(Variance.id == variance_id)
     )
     variance = session.exec(statement).first()
@@ -31,7 +33,7 @@ def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)
     if variance is None:
         raise HTTPException(status_code=404, detail="Variance not found.")
 
-    return variance
+    return variance.load_relations(relations_to_load=["product"])
 
 @router.post("/")
 async def create_variance(request: Request, session: Session = Depends(get_session)):
@@ -58,7 +60,7 @@ async def create_variance(request: Request, session: Session = Depends(get_sessi
 
     session.refresh(new_variance)
 
-    return {"variance": new_variance.dict()}
+    return new_variance.load_relations(relations_to_load=["product"])
 
 @router.patch("/{variance_id}")
 async def update_variance(variance_id: int, request: Request, session: Session = Depends(get_session)):
@@ -82,7 +84,7 @@ async def update_variance(variance_id: int, request: Request, session: Session =
 
     session.refresh(variance)
 
-    return {"variance": variance.dict()}
+    return variance.load_relations(relations_to_load=["product"])
 
 
 
