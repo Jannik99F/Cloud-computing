@@ -11,4 +11,4 @@ class Product(BaseModel, table=True):
     height: float
     width: float
     depth: float
-    variances: List["Variance"] = Relationship(back_populates="product")
+    variances: List["Variance"] = Relationship(back_populates="product", cascade_delete=True)
