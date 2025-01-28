@@ -18,10 +18,10 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here for 'autogenerate' support
 # from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = None
+# target_metadata = SQLModel.metadata
+target_metadata = SQLModel.metadata
 
-# Load the DATABASE_URL from environment variables
+# Load the DATABASE_URL from environment variables.
 DATABASE_URL = database_url = os.getenv("DB_URL_LOCAL") if os.getenv("DEBUG") == "true" else os.getenv("DB_URL_PROD")
 if DATABASE_URL is None:
     raise ValueError("DB_URL is not set in the .env file")
