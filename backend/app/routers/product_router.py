@@ -1,6 +1,5 @@
 from sqlmodel import Session, SQLModel, select
 from models.product import Product
-from sqlalchemy.orm import selectinload
 
 from db.engine import DatabaseManager, get_session
 
@@ -13,7 +12,7 @@ router = APIRouter(
 
 @router.get("/")
 def get_all_products(session: Session = Depends(get_session)):
-    statement = select(Product).options(selectinload(Product.variances))
+    statement = select(Product)
     products = session.exec(statement).all()
 
     products = [product.load_relations(relations_to_load=["variances"]) for product in products]
