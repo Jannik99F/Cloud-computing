@@ -35,8 +35,8 @@ def upgrade():
             nullable=False
         ),
         sa.Column('amount', sa.Integer),
-        sa.Column('base_price', sa.Float),
-        sa.Column('variance_price', sa.Float),
+        sa.Column('base_price', sa.Float, nullable=True),
+        sa.Column('variance_price', sa.Float, nullable=True),
     )
     pass
 
