@@ -18,10 +18,10 @@ def check_user_exists(user_id: int):
 router = APIRouter(
     prefix="/current-basket",
     tags=["current-basket"],
-    dependencies=[Depends(check_user_exists)],
 )
 
 def get_current_basket_model(user_id: int, session: Session):
+    check_user_exists(user_id)
     # TODO: Here, a real query is needed fetching the current basket for user.
     # The plan is to determine which is the current basket based on a basket
     # being already included in an order. The one basket, which is not included
