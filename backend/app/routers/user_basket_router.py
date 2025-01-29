@@ -114,6 +114,9 @@ async def add_item_to_current_basket(user_id: int, basket_item_id: int, request:
     additional_amount = item_data.get("additional_amount", None)
 
     if additional_amount:
+        if additional_amount < 0:
+            raise HTTPException(status_code=400, detail="Additional amount must be greater than 0.")
+
         basket_item.amount += additional_amount
     else:
         basket_item.amount += 1
@@ -138,6 +141,8 @@ async def remove_item_from_current_basket(user_id: int, basket_item_id: int, req
     removal_amount = item_data.get("removal_amount", None)
 
     if removal_amount:
+        if removal_amount < 0:
+            raise HTTPException(status_code=400, detail="Additional amount must be greater than 0.")
         basket_item.amount -= removal_amount
     else:
         basket_item.amount -= 1
