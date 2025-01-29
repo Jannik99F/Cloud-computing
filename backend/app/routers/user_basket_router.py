@@ -6,7 +6,7 @@ from models.basket_item import BasketItem
 
 from db.engine import DatabaseManager, get_session
 
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends, Query
 
 def check_user_exists(user_id: int):
     statement = select(User).where(User.id == user_id)
@@ -16,8 +16,8 @@ def check_user_exists(user_id: int):
         raise HTTPException(status_code=404, detail="User not found.")
 
 router = APIRouter(
-    prefix="/users/{user_id}",
-    tags=["basket"],
+    prefix="/current-basket",
+    tags=["current-basket"],
     dependencies=[Depends(check_user_exists)],
 )
 
@@ -46,12 +46,12 @@ def get_basket_item(basket_item_id: int, session: Session):
     statement = select(BasketItem).where(BasketItem.id == basket_item_id)
     return session.exec(statement).first()
 
-@router.put("/current-basket")
-def get_current_basket(user_id: int, session: Session = Depends(get_session)):
+@router.put("/")
+def get_current_basket(session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
     return get_current_basket_model(user_id, session).load_relations(relations_to_load=['basket_items'])
 
-@router.put("/current-basket/add-item")
-async def add_item_to_current_basket(user_id: int, request: Request, session: Session = Depends(get_session)):
+@router.put("/add-item")
+async def add_item_to_current_basket(request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
     basket = get_current_basket_model(user_id, session)
 
     item_data = await request.json()
@@ -86,7 +86,7 @@ async def add_item_to_current_basket(user_id: int, request: Request, session: Se
 
     return basket.load_relations(relations_to_load=['basket_items'])
 
-@router.delete("/current-basket/remove-item/{basket_item_id}")
+@router.delete("/remove-item/{basket_item_id}")
 async def add_item_to_current_basket(basket_item_id: int, session: Session = Depends(get_session)):
     statement = select(BasketItem).where(BasketItem.id == basket_item_id)
     basket_item = session.exec(statement).first()
@@ -99,8 +99,8 @@ async def add_item_to_current_basket(basket_item_id: int, session: Session = Dep
 
     return {"message": "BasketItem deleted successfully."}
 
-@router.put("/current-basket/item/{basket_item_id}/add")
-async def add_item_to_current_basket(user_id: int, basket_item_id: int, request: Request, session: Session = Depends(get_session)):
+@router.put("/item/{basket_item_id}/add")
+async def add_item_to_current_basket(basket_item_id: int, request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
     basket_item = get_basket_item(basket_item_id, session)
 
     if basket_item is None:
@@ -126,8 +126,8 @@ async def add_item_to_current_basket(user_id: int, basket_item_id: int, request:
 
     return get_current_basket_model(user_id, session).load_relations(relations_to_load=['basket_items'])
 
-@router.put("/current-basket/item/{basket_item_id}/remove")
-async def remove_item_from_current_basket(user_id: int, basket_item_id: int, request: Request, session: Session = Depends(get_session)):
+@router.put("/item/{basket_item_id}/remove")
+async def remove_item_from_current_basket(basket_item_id: int, request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
     basket_item = get_basket_item(basket_item_id, session)
 
     if basket_item is None:
