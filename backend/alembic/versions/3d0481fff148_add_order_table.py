@@ -22,6 +22,7 @@ def upgrade():
     op.create_table(
         'order',
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('payment_secret', sa.String(), nullable=True),
         sa.Column('shipping_address', sa.String(), nullable=True),
         sa.Column('billing_address', sa.String(), nullable=True),
         sa.Column('payment_method', sa.String(), nullable=True),
