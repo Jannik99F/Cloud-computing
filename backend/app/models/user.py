@@ -6,6 +6,8 @@ from models.order import Order
 from db.engine import get_session
 from enums.enums import OrderStatus
 
+from models.order import TaskOrder
+
 class User(BaseModel, table=True):
     id: int = Field(default=None, primary_key=True)
     first_name: str
@@ -60,5 +62,8 @@ class User(BaseModel, table=True):
             session.add(new_order)
             session.commit()
             session.refresh(new_order)
+
+            task = TaskOrder(new_order.id)
+            task.start_expiration_timer()
 
         return order
