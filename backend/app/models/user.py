@@ -8,6 +8,8 @@ from enums.enums import OrderStatus
 
 from models.order import TaskOrder
 
+from models.basket_item import (BasketItem)
+
 class User(BaseModel, table=True):
     id: int = Field(default=None, primary_key=True)
     first_name: str
@@ -24,6 +26,11 @@ class User(BaseModel, table=True):
         return get_session().exec(statement).first()
 
     def get_current_basket(self, session: Session) -> Basket:
+        # TODO: Additionally, we need here that a basket is just returned when the current
+        # basket isn't included in and order for which the payment was already started.
+        # If we don't do this the user might continue adding things to the basket which
+        # is already started being ordered.
+
         # TODO: Here, a real query is needed fetching the current basket for user.
         # The plan is to determine which is the current basket based on a basket
         # being already included in an order. The one basket, which is not included
@@ -44,7 +51,7 @@ class User(BaseModel, table=True):
 
         return basket
 
-    def get_current_order(self, session: Session) -> Basket:
+    def get_current_order(self, session: Session):
         statement = (
             select(Order)
             .where(Basket.user_id == self.id)
@@ -54,6 +61,12 @@ class User(BaseModel, table=True):
         order = session.exec(statement).first()
 
         if order is None:
+            basket = self.get_current_basket(session)
+            basket_items = session.exec(select(BasketItem).where(BasketItem.basket_id == basket.id)).first()
+
+            if not basket_items:
+                return None
+
             order = new_order = Order(
                 basket_id=self.get_current_basket(session).id,
                 payed=False,
