@@ -115,13 +115,15 @@ async def add_payment_method(request: Request, session: Session = Depends(get_se
 async def pay(session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
 
-    if order.status != OrderStatus.PENDING.value:
+    if order.status != OrderStatus.PENDING.value and order.status != OrderStatus.PAYMENT_STARTED.value:
         raise HTTPException(status_code=400, detail="Order not pending.")
 
     if order.shipping_address is None or order.billing_address is None or order.payment_method is None:
         raise HTTPException(status_code=400, detail="There aren't yet all order information provided.")
 
     payment_secret = order.current_payment_secret(session)
+
+    order.set_basket_items_price(session)
 
     session.close()
 

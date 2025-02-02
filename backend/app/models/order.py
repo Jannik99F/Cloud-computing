@@ -28,7 +28,22 @@ class Order(BaseModel, table=True):
 
             self.create_payment_secret(session)
 
+            session.refresh(self)
+
         return self.payment_secret
+
+    def set_basket_items_price(self, session: Session):
+        # Right here, the basket_items prices will be set to the current prices.
+        # If the prices for a product or its variance will be edited this won't
+        # affect the order and the prices at the time when it was bought will be
+        # kept to be able to do refunds if necessary.
+
+        for basket_item in self.basket.basket_items:
+            basket_item.base_price = basket_item.variance.product.base_price
+            basket_item.variance_price = basket_item.variance.price
+
+            session.add(basket_item)
+            session.commit()
 
     def create_payment_secret(self, session: Session):
         # I looked up on the internet how the payment process would work.
@@ -43,6 +58,8 @@ class Order(BaseModel, table=True):
 
         # So here the PayPal API would be called and the secret would be created.
         payment_secret = "Some secret containing payment method, order details and who to pay to."
+
+        self.payment_secret = payment_secret
 
         session.add(self)
         session.commit()
