@@ -1,5 +1,6 @@
 from sqlmodel import Field, SQLModel, Relationship, select, Session
 from models.base_model import BaseModel
+from models.basket import Basket
 from typing import Optional
 from datetime import datetime, timedelta
 from tasks.celery_app import celery_app
@@ -20,6 +21,11 @@ class Order(BaseModel, table=True):
 
     def current_payment_secret(self, session: Session):
         if not self.payment_secret:
+            self.status = OrderStatus.PAYMENT_STARTED.value
+
+            session.add(self)
+            session.commit()
+
             self.create_payment_secret(session)
 
         return self.payment_secret
@@ -38,9 +44,6 @@ class Order(BaseModel, table=True):
         # So here the PayPal API would be called and the secret would be created.
         payment_secret = "Some secret containing payment method, order details and who to pay to."
 
-        self.payment_secret = payment_secret
-        self.status = OrderStatus.PAYMENT_STARTED
-
         session.add(self)
         session.commit()
 
@@ -57,7 +60,7 @@ class Order(BaseModel, table=True):
             return False
 
         self.payed = True
-        self.status = OrderStatus.PAYMENT_COMPLETED
+        self.status = OrderStatus.PAYMENT_COMPLETED.value
 
         session.add(self)
         session.commit()
@@ -71,13 +74,21 @@ class TaskOrder:
 
     def start_expiration_timer(self):
         expire_order.apply_async(args=[self.order_id], eta=self.expiration_time)
-        print(f"⏳ Order {self.order_id} will expire at {self.expiration_time}")
+        print(f"Order {self.order_id} will expire at {self.expiration_time}")
 
 @celery_app.task
 def expire_order(order_id: int):
     session = get_session()
     statement = select(Order).where(Order.id == order_id)
     order = session.exec(statement).first()
-    if order and order.status != "completed":
+
+    statement = select(Basket).where(Basket.idf == order.basket_id)
+    basket = session.exec(statement).first()
+    if order and order.status != OrderStatus.PAYMENT_COMPLETED.value:
+        session.delete(basket)
+        session.commit()
+
         session.delete(order)
         session.commit()
+
+    session.close()

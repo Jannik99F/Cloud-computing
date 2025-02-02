@@ -2,6 +2,8 @@ from sqlmodel import Session, SQLModel, select
 from models.user import User
 from models.variance import Variance
 from models.basket_item import BasketItem
+from models.basket import Basket
+from models.order import Order
 
 from db.engine import DatabaseManager, get_session
 
@@ -12,14 +14,33 @@ router = APIRouter(
     tags=["current-basket"]
 )
 
-def get_basket_item(basket_item_id: int, session: Session):
-    statement = select(BasketItem).where(BasketItem.id == basket_item_id)
-    basket_item = session.exec(statement)
+def get_basket_item(user: User, basket_item_id: int, session: Session):
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    basket = user.get_current_basket(session)
+
+    statement = select(BasketItem).where(BasketItem.id == basket_item_id).where(BasketItem.basket_id == basket.id)
+    basket_item = session.exec(statement).first()
 
     if basket_item is None:
         raise HTTPException(status_code=404, detail="BasketItem not found.")
 
     return basket_item
+
+# The decision was made to only allow orders having basket which has at least
+# one BasketItem. When a BasketItem is removed and the Basket gets empty,
+# the order has to be removed as well.
+def check_existing_order_must_be_deleted(basket: Basket ,session: Session):
+    statement = select(BasketItem).where(BasketItem.basket_id == basket.id)
+    basket_item = session.exec(statement).first()
+
+    statement = select(Order).where(Order.basket_id == basket.id)
+    order = session.exec(statement).first()
+
+    if basket_item is None and order is not None:
+        session.delete(order)
+        session.commit()
 
 @router.put("/")
 def get_current_basket(session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
@@ -28,7 +49,11 @@ def get_current_basket(session: Session = Depends(get_session), user_id: int = Q
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+    basket = user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+
+    session.close()
+
+    return basket
 
 @router.post("/add-item")
 async def add_item_to_current_basket(request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
@@ -69,20 +94,30 @@ async def add_item_to_current_basket(request: Request, session: Session = Depend
 
     session.refresh(basket_item)
 
-    return basket.load_relations(relations_to_load=['basket_items'])
+    basket = basket.load_relations(relations_to_load=['basket_items'])
+
+    session.close()
+
+    return basket
 
 @router.delete("/remove-item/{basket_item_id}")
-async def add_item_to_current_basket(basket_item_id: int, session: Session = Depends(get_session)):
-    basket_item = get_basket_item(basket_item_id, session)
+async def add_item_to_current_basket(basket_item_id: int, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
+    basket_item = get_basket_item(User.get_user(user_id), basket_item_id, session)
+
+    basket = basket_item.basket
 
     session.delete(basket_item)
     session.commit()
+
+    check_existing_order_must_be_deleted(basket, session)
+
+    session.close()
 
     return {"message": "BasketItem deleted successfully."}
 
 @router.put("/item/{basket_item_id}/add")
 async def add_item_to_current_basket(basket_item_id: int, request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
-    basket_item = get_basket_item(basket_item_id, session)
+    basket_item = get_basket_item(User.get_user(user_id), basket_item_id, session)
 
     try:
         item_data = await request.json()
@@ -107,11 +142,15 @@ async def add_item_to_current_basket(basket_item_id: int, request: Request, sess
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+    basket = user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+
+    session.close()
+
+    return basket
 
 @router.put("/item/{basket_item_id}/remove")
 async def remove_item_from_current_basket(basket_item_id: int, request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
-    basket_item = get_basket_item(basket_item_id, session)
+    basket_item = get_basket_item(User.get_user(user_id), basket_item_id, session)
 
     try:
         item_data = await request.json()
@@ -138,4 +177,8 @@ async def remove_item_from_current_basket(basket_item_id: int, request: Request,
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+    basket = user.get_current_basket(session).load_relations(relations_to_load=['basket_items'])
+
+    session.close()
+
+    return basket

@@ -5,6 +5,8 @@ from db.engine import DatabaseManager, get_session
 
 from fastapi import APIRouter, Request, HTTPException, Depends, Query
 
+from enums.enums import OrderStatus
+
 NO_USER_DESCRIPTION = "The ID of the user whose basket is requested"
 
 router = APIRouter(
@@ -21,9 +23,7 @@ def check_user_and_order_existence(session: Session, user_id: int):
     order = user.get_current_order(session)
 
     if order is None:
-        raise HTTPException(status_code=400, detail="No items in the basket yet for which an order could be placed.")
-
-    # TODO: here needs to be checked that only pending orders will be edited.
+        raise HTTPException(status_code=400, detail="No order found.")
 
     return order
 
@@ -34,11 +34,18 @@ def get_current_order(session: Session = Depends(get_session), user_id: int = Qu
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return check_user_and_order_existence(session, user_id).load_relations(["basket.basket_items.variance.product"])
+    order = check_user_and_order_existence(session, user_id).load_relations(["basket.basket_items.variance.product"])
+
+    session.close()
+
+    return order
 
 @router.put("/add-shipping-address")
 async def add_shipping_address(request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
+
+    if order.status != OrderStatus.PENDING.value:
+        raise HTTPException(status_code=400, detail="Order not pending.")
 
     data = await request.json()
 
@@ -49,11 +56,18 @@ async def add_shipping_address(request: Request, session: Session = Depends(get_
 
     session.refresh(order)
 
-    return order.load_relations(["basket.basket_items.variance.product"])
+    order = order.load_relations(["basket.basket_items.variance.product"])
+
+    session.close()
+
+    return order
 
 @router.put("/add-billing-address")
 async def add_billing_address(request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
+
+    if order.status != OrderStatus.PENDING.value:
+        raise HTTPException(status_code=400, detail="Order not pending.")
 
     data = await request.json()
 
@@ -69,11 +83,18 @@ async def add_billing_address(request: Request, session: Session = Depends(get_s
 
     session.refresh(order)
 
-    return order.load_relations(["basket.basket_items.variance.product"])
+    order = order.load_relations(["basket.basket_items.variance.product"])
+
+    session.close()
+
+    return order
 
 @router.put("/add-payment-method")
 async def add_payment_method(request: Request, session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
+
+    if order.status != OrderStatus.PENDING.value:
+        raise HTTPException(status_code=400, detail="Order not pending.")
 
     data = await request.json()
 
@@ -84,23 +105,34 @@ async def add_payment_method(request: Request, session: Session = Depends(get_se
 
     session.refresh(order)
 
-    return order.load_relations(["basket.basket_items.variance.product"])
+    order.load_relations(["basket.basket_items.variance.product"])
+
+    session.close()
+
+    return order
 
 @router.put("/pay")
 async def pay(session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
 
+    if order.status != OrderStatus.PENDING.value:
+        raise HTTPException(status_code=400, detail="Order not pending.")
+
     if order.shipping_address is None or order.billing_address is None or order.payment_method is None:
         raise HTTPException(status_code=400, detail="There aren't yet all order information provided.")
 
-    return order.current_payment_secret(session)
+    payment_secret = order.current_payment_secret(session)
+
+    session.close()
+
+    return payment_secret
 
 @router.post("/checkout")
 async def checkout(session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
 
-    if not order.payment_secret:
-        raise HTTPException(status_code=400, detail="Payment process not initialized yet.")
+    if order.status != OrderStatus.PAYMENT_STARTED.value:
+        raise HTTPException(status_code=400, detail="Order not pending.")
 
     if order.payed:
         raise HTTPException(status_code=400, detail="Payment already confirmed.")
@@ -108,6 +140,10 @@ async def checkout(session: Session = Depends(get_session), user_id: int = Query
     if not order.is_payed(session):
         raise HTTPException(status_code=404, detail="Couldn't confirm the payment.")
 
+    order = order.load_relations(["basket.basket_items.variance.product"])
+
+    session.close()
+
     # TODO: Right here to order would really be placed and the shipping process started with an confirmation email.
 
-    return order.load_relations(["basket.basket_items.variance.product"])
+    return order

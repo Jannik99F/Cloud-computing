@@ -25,6 +25,8 @@ def get_all_variances(product_id, session: Session = Depends(get_session)):
     statement = select(Variance).where(Variance.product_id == product_id)
     variances = session.exec(statement).all()
 
+    session.close()
+
     return variances
 
 @router.get("/{variance_id}")
@@ -34,6 +36,8 @@ def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)
 
     if variance is None:
         raise HTTPException(status_code=404, detail="Variance not found.")
+
+    session.close()
 
     return variance
 
@@ -61,6 +65,8 @@ async def create_variance(product_id: int, request: Request, session: Session = 
 
     session.refresh(new_variance)
 
+    session.close()
+
     return new_variance
 
 @router.patch("/{variance_id}")
@@ -82,6 +88,8 @@ async def update_variance(variance_id: int, request: Request, session: Session =
 
     session.refresh(variance)
 
+    session.close()
+
     return variance
 
 
@@ -95,5 +103,7 @@ def delete_user(variance_id: int, session: Session = Depends(get_session)):
 
     session.delete(variance)
     session.commit()
+
+    session.close()
 
     return {"message": "Variance deleted successfully."}
