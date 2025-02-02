@@ -17,6 +17,8 @@ def get_all_products(session: Session = Depends(get_session)):
 
     products = [product.load_relations(relations_to_load=["variances"]) for product in products]
 
+    session.close()
+
     return products
 
 @router.get("/{product_id}")
@@ -27,7 +29,11 @@ def get_product_by_id(product_id: int, session: Session = Depends(get_session)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found.")
 
-    return product.load_relations(relations_to_load=["variances"])
+    product = product.load_relations(relations_to_load=["variances"])
+
+    session.close()
+
+    return product
 
 @router.post("/")
 async def create_product(request: Request, session: Session = Depends(get_session)):
@@ -55,7 +61,11 @@ async def create_product(request: Request, session: Session = Depends(get_sessio
 
     session.refresh(new_product)
 
-    return new_product.load_relations(relations_to_load=["variances"])
+    new_product =new_product.load_relations(relations_to_load=["variances"])
+
+    session.close()
+
+    return new_product
 
 @router.patch("/{product_id}")
 async def update_product(product_id: int, request: Request, session: Session = Depends(get_session)):
@@ -76,7 +86,11 @@ async def update_product(product_id: int, request: Request, session: Session = D
 
     session.refresh(product)
 
-    return product.load_relations(relations_to_load=["variances"])
+    product = product.load_relations(relations_to_load=["variances"])
+
+    session.close()
+
+    return product
 
 @router.delete("/{product_id}")
 def delete_product(product_id: int, session: Session = Depends(get_session)):
@@ -87,5 +101,7 @@ def delete_product(product_id: int, session: Session = Depends(get_session)):
 
     session.delete(product)
     session.commit()
+
+    session.close()
 
     return {"message": "Product deleted successfully."}
