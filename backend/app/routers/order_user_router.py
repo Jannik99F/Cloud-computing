@@ -115,6 +115,11 @@ async def add_payment_method(request: Request, session: Session = Depends(get_se
 async def pay(session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
 
+    # TODO: Here, the items included in the order should be reserved from the storage
+    # so they are marked as sold until the order is finished and they are really sold
+    # or the order is cancelled for some reason an the items can be added to the storage
+    # again.
+
     if order.status != OrderStatus.PENDING.value and order.status != OrderStatus.PAYMENT_STARTED.value:
         raise HTTPException(status_code=400, detail="Order not pending.")
 
@@ -146,6 +151,6 @@ async def checkout(session: Session = Depends(get_session), user_id: int = Query
 
     session.close()
 
-    # TODO: Right here to order would really be placed and the shipping process started with an confirmation email.
+    # TODO: A confirmation mail needs to be send.
 
     return order

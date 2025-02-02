@@ -84,6 +84,9 @@ class Order(BaseModel, table=True):
 
         return self.id
 
+    def pay_money_back(self):
+        print("The money is payed back to the user.")
+
 class TaskOrder:
     def __init__(self, order_id: int, expiration_minutes: int = 30):
         self.order_id = order_id
@@ -104,6 +107,15 @@ def expire_order(order_id: int):
     if order and order.status != OrderStatus.PAYMENT_COMPLETED.value:
         session.delete(basket)
         session.commit()
+
+        # When the user payed in the popout window of paypal but didn't
+        # afterwards no our website again confirm the purchase, the money
+        # will be payed back to the user and the order is deleted/cancelled.
+        if order.is_payed(session):
+            order.pay_money_back()
+
+        # TODO: If the order expired and wasn't finished the items reserved in the storage
+        # have to be freed again.
 
         session.delete(order)
         session.commit()
