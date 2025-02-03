@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /backend/app
 
-RUN pip install --no-cache-dir fastapi uvicorn psycopg2-binary alembic sqlmodel python-dotenv
+RUN pip install --no-cache-dir fastapi uvicorn psycopg2-binary alembic sqlmodel python-dotenv celery redis
 
 COPY ./app /backend/app
 
