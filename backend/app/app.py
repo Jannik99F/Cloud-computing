@@ -1,7 +1,7 @@
 import time
 
 from fastapi import FastAPI
-from routers import user_router, product_router, variance_router, user_basket_router, order_user_router, order_router
+from routers import user_router, product_router, variance_router, user_basket_router, order_user_router, order_router, inventory_router
 from db.engine import DatabaseManager
 
 from dotenv import load_dotenv
@@ -19,6 +19,7 @@ app.include_router(variance_router.router)
 app.include_router(user_basket_router.router)
 app.include_router(order_user_router.router)
 app.include_router(order_router.router)
+app.include_router(inventory_router.router)
 
 @app.get("/")
 def read_root():
