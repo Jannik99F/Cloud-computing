@@ -1,23 +1,31 @@
 from sqlmodel import Session, SQLModel, select
 from models.variance import Variance
 from models.product import Product
-from sqlalchemy.orm import selectinload
 
 from db.engine import DatabaseManager, get_session
 
 from fastapi import APIRouter, Request, HTTPException, Depends
 
+
+def check_product_exists(product_id: int):
+    statement = select(Product).where(Product.id == product_id)
+    product = get_session().exec(statement).first()
+
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found.")
+
 router = APIRouter(
-    prefix="/variances",
-    tags=["variances"]
+    prefix="/products/{product_id}/variances",
+    tags=["variances"],
+    dependencies=[Depends(check_product_exists)],
 )
 
 @router.get("/")
-def get_all_variances(session: Session = Depends(get_session)):
-    statement = select(Variance)
+def get_all_variances(product_id, session: Session = Depends(get_session)):
+    statement = select(Variance).where(Variance.product_id == product_id)
     variances = session.exec(statement).all()
 
-    variances = [variance.load_relations(relations_to_load=["product"]) for variance in variances]
+    session.close()
 
     return variances
 
@@ -29,13 +37,14 @@ def get_variance_by_id(variance_id: int, session: Session = Depends(get_session)
     if variance is None:
         raise HTTPException(status_code=404, detail="Variance not found.")
 
-    return variance.load_relations(relations_to_load=["product"])
+    session.close()
+
+    return variance
 
 @router.post("/")
-async def create_variance(request: Request, session: Session = Depends(get_session)):
+async def create_variance(product_id: int, request: Request, session: Session = Depends(get_session)):
     user_data = await request.json()
 
-    product_id = user_data.get("product_id")
     name = user_data.get("name")
     variance_type = user_data.get("variance_type")
     price = user_data.get("price")
@@ -56,7 +65,9 @@ async def create_variance(request: Request, session: Session = Depends(get_sessi
 
     session.refresh(new_variance)
 
-    return new_variance.load_relations(relations_to_load=["product"])
+    session.close()
+
+    return new_variance
 
 @router.patch("/{variance_id}")
 async def update_variance(variance_id: int, request: Request, session: Session = Depends(get_session)):
@@ -68,9 +79,6 @@ async def update_variance(variance_id: int, request: Request, session: Session =
     if variance is None:
         raise HTTPException(status_code=404, detail="Variance not found.")
 
-    if "product_id" in data:
-        raise HTTPException(status_code=400, detail="product_id cannot be updated.")
-
     for key, value in data.items():
         if value is not None and hasattr(variance, key):
             setattr(variance, key, value)
@@ -80,7 +88,9 @@ async def update_variance(variance_id: int, request: Request, session: Session =
 
     session.refresh(variance)
 
-    return variance.load_relations(relations_to_load=["product"])
+    session.close()
+
+    return variance
 
 
 
@@ -93,5 +103,7 @@ def delete_user(variance_id: int, session: Session = Depends(get_session)):
 
     session.delete(variance)
     session.commit()
+
+    session.close()
 
     return {"message": "Variance deleted successfully."}

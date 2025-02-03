@@ -15,6 +15,8 @@ def get_all_users(session: Session = Depends(get_session)):
     statement = select(User)
     users = session.exec(statement).all()
 
+    session.close()
+
     return users
 
 @router.get("/{user_id}")
@@ -24,6 +26,8 @@ def get_user_by_id(user_id: int, session: Session = Depends(get_session)):
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
+
+    session.close()
 
     return user
 
@@ -49,6 +53,8 @@ async def create_user(request: Request, session: Session = Depends(get_session))
 
     session.refresh(new_user)
 
+    session.close()
+
     return new_user
 
 @router.patch("/{user_id}")
@@ -70,6 +76,8 @@ async def update_user(user_id: int, request: Request, session: Session = Depends
 
     session.refresh(user)
 
+    session.close()
+
     return user
 
 
@@ -82,5 +90,7 @@ def delete_user(user_id: int, session: Session = Depends(get_session)):
 
     session.delete(user)
     session.commit()
+
+    session.close()
 
     return {"message": "User deleted successfully."}
