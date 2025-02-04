@@ -3,7 +3,7 @@
     <h1>Product Catalog</h1>
     <div class="catalog-grid">
       <!-- Loop through products -->
-      <div v-for="product in products" :key="product.id" class="product-card">
+      <div v-for="product in products" :key="product.id" class="product-card" @click="openProductDetails(product.id)">
         <img :src="product.image" :alt="product.name" class="product-image" />
         <h3>{{ product.name }}</h3>
         <p class="product-category">{{ product.category }}</p>
@@ -16,8 +16,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-interface Product {
+export interface Product {
   id: number
   name: string
   description: string
@@ -120,6 +121,10 @@ const products = ref<Product[]>([
 ])
 function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`
+}
+
+function openProductDetails(id: number) {
+  useRouter().push(`/${id}`);
 }
 </script>
 
