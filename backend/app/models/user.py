@@ -72,6 +72,7 @@ class User(BaseModel, table=True):
             order = new_order = Order(
                 basket_id=self.get_current_basket(session).id,
                 payed=False,
+                items_reserved=False,
                 status=OrderStatus.PENDING.value,
             )
             session.add(new_order)
