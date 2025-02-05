@@ -135,8 +135,8 @@ async def lower_inventory_item_amount(variance_id: int, request: Request, sessio
     else:
         variance_for_inventory.amount -= 1
 
-    if variance_for_inventory.amount < 1:
-        raise HTTPException(status_code=400, detail="Amount cannot go below 1.")
+    if variance_for_inventory.amount < 0:
+        raise HTTPException(status_code=400, detail="Amount cannot go below 0.")
 
     session.add(variance_for_inventory)
     session.commit()
