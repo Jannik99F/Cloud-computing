@@ -1,11 +1,12 @@
 from sqlmodel import Field, SQLModel, Relationship, select, Session
 from models.base_model import BaseModel
 from models.basket import Basket
+from models.inventory import Inventory
 from typing import Optional
 from datetime import datetime, timedelta
 from tasks.celery_app import celery_app
 from db.engine import get_session
-import random
+
 from enums.enums import OrderStatus
 
 class Order(BaseModel, table=True):
@@ -15,8 +16,9 @@ class Order(BaseModel, table=True):
     payment_method: Optional["str"]
     payment_secret: Optional["str"]
     payed: bool
+    items_reserved: bool
     status: str
-    basket_id: int = Field(default=None, foreign_key="basket.id")
+    basket_id: int = Field(default=None, foreign_key="basket.id", ondelete="CASCADE")
     basket: "Basket" = Relationship(back_populates="order")
 
     def current_payment_secret(self, session: Session):
@@ -27,8 +29,6 @@ class Order(BaseModel, table=True):
             session.commit()
 
             self.create_payment_secret(session)
-
-            session.refresh(self)
 
         return self.payment_secret
 
@@ -71,7 +71,10 @@ class Order(BaseModel, table=True):
         # process is done, the order itself checks whether this is true
         # based on the secret. If it is the function returns true to finish
         # the order.
-        payed = random.choice([True, False])
+
+        # Here the paypal API would be called based on the secret to check
+        # whether the user payed.
+        payed = True
 
         if not payed:
             return False
@@ -102,22 +105,32 @@ def expire_order(order_id: int):
     statement = select(Order).where(Order.id == order_id)
     order = session.exec(statement).first()
 
-    statement = select(Basket).where(Basket.idf == order.basket_id)
-    basket = session.exec(statement).first()
     if order and order.status != OrderStatus.PAYMENT_COMPLETED.value:
-        session.delete(basket)
-        session.commit()
-
         # When the user payed in the popout window of paypal but didn't
         # afterwards no our website again confirm the purchase, the money
         # will be payed back to the user and the order is deleted/cancelled.
         if order.is_payed(session):
             order.pay_money_back()
 
-        # TODO: If the order expired and wasn't finished the items reserved in the storage
-        # have to be freed again.
+        # The reserved items will be put back into the stock if the
+        # payment process wasn't completed and the order will be
+        # deleted because it is unfinished.
+        if order.items_reserved:
+            for basket_item in order.basket.basket_items:
+                statement = select(Inventory).where(Inventory.variance_id == basket_item.variance_id)
+                variance_for_inventory = session.execute(statement).scalar_one_or_none()
 
-        session.delete(order)
+                try:
+                    variance_for_inventory.amount += basket_item.amount
+                except Exception:
+                    print("It looks like someone removed the inventory item. The amount included in the order can't be added again.")
+
+                session.add(variance_for_inventory)
+
+        basket = order.basket
+
+        session.delete(basket)
+
         session.commit()
 
     session.close()
