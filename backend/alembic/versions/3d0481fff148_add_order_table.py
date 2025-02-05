@@ -27,6 +27,7 @@ def upgrade():
         sa.Column('billing_address', sa.String(), nullable=True),
         sa.Column('payment_method', sa.String(), nullable=True),
         sa.Column('payed', sa.Boolean(), nullable=False),
+        sa.Column('items_reserved', sa.Boolean(), nullable=False),
         sa.Column('status', sa.String(), nullable=False),
         sa.Column(
             'basket_id',
