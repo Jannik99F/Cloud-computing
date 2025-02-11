@@ -59,6 +59,21 @@ services:
     networks:
       - webshop-network
 
+  frontend:
+    build:
+      context: frontend/vue-project  # Path to frontend Dockerfile
+      dockerfile: Dockerfile
+    container_name: webshop-frontend
+    ports:
+      - "5173:5173"  # Vite default port
+    volumes:
+      - ./frontend/vue-project:/app  # Mount source code
+      - /app/node_modules  # Keep container dependencies isolated
+    depends_on:
+      - webshop  # Start after backend
+    networks:
+      - webshop-network
+
 networks:
   webshop-network:
     driver: bridge

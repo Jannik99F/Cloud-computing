@@ -40,7 +40,6 @@ async def create_product(request: Request, session: Session = Depends(get_sessio
     product_data = await request.json()
 
     for product in product_data:
-
         base_price = product.get("base_price")
         name = product.get("name")
         furniture_type = product.get("furniture_type")

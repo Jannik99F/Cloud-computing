@@ -116,7 +116,7 @@ async def add_payment_method(request: Request, session: Session = Depends(get_se
 @router.put("/pay")
 async def pay(session: Session = Depends(get_session), user_id: int = Query(..., description=NO_USER_DESCRIPTION)):
     order = check_user_and_order_existence(session, user_id)
-
+    
     if order.shipping_address is None or order.billing_address is None or order.payment_method is None:
         raise HTTPException(status_code=400, detail="There aren't yet all order information provided.")
 
