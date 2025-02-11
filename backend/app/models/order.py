@@ -6,7 +6,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 from tasks.celery_app import celery_app
 from db.engine import get_session
-
+import random
 from enums.enums import OrderStatus
 
 class Order(BaseModel, table=True):
@@ -29,6 +29,8 @@ class Order(BaseModel, table=True):
             session.commit()
 
             self.create_payment_secret(session)
+
+            session.refresh(self)
 
         return self.payment_secret
 
@@ -71,7 +73,7 @@ class Order(BaseModel, table=True):
         # process is done, the order itself checks whether this is true
         # based on the secret. If it is the function returns true to finish
         # the order.
-
+        
         # Here the paypal API would be called based on the secret to check
         # whether the user payed.
         payed = True
@@ -105,7 +107,11 @@ def expire_order(order_id: int):
     statement = select(Order).where(Order.id == order_id)
     order = session.exec(statement).first()
 
+    statement = select(Basket).where(Basket.idf == order.basket_id)
+    basket = session.exec(statement).first()
+
     if order and order.status != OrderStatus.PAYMENT_COMPLETED.value:
+
         # When the user payed in the popout window of paypal but didn't
         # afterwards no our website again confirm the purchase, the money
         # will be payed back to the user and the order is deleted/cancelled.

@@ -1,6 +1,7 @@
 import time
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers import user_router, product_router, variance_router, user_basket_router, order_user_router, order_router, inventory_router
 from db.engine import DatabaseManager
 
@@ -12,6 +13,14 @@ load_dotenv()
 DatabaseManager.initialize()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(user_router.router)
 app.include_router(product_router.router)

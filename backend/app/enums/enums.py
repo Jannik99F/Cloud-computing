@@ -56,4 +56,3 @@ class ProductType(str, Enum):
     PATIO_CHAIR = "patio_chair"
     HAMMOCK = "hammock"
     OUTDOOR_TABLE = "outdoor_table"
-
