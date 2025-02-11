@@ -45,4 +45,3 @@ playwright-report/
 
 # Other
 *.env.*         # to ignore variations (e.g., .env.production)
-
