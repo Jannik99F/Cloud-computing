@@ -4,8 +4,11 @@
 # pycache directories in backend
 backend/app/__pycache__
 backend/app/db/__pycache__
+backend/app/enums/__pycache__
 backend/app/models/__pycache__
 backend/app/routers/__pycache__
+backend/app/tasks/__pycache__
 
 # node_modules in frontend 
 frontend/vue-project/node_modules
+frontend/vue-project/.vite
