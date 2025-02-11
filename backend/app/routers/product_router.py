@@ -67,7 +67,7 @@ async def create_product(request: Request, session: Session = Depends(get_sessio
 
     session.close()
 
-    return str(len(product_data)) + " products were created successfully."
+    return { "message": str(len(product_data)) + " products were created successfully." }
 
 @router.patch("/{product_id}")
 async def update_product(product_id: int, request: Request, session: Session = Depends(get_session)):
@@ -109,10 +109,14 @@ def delete_product(product_id: int, session: Session = Depends(get_session)):
     return {"message": "Product deleted successfully."}
 
 @router.delete("/")
-def delete_all_products(session: Session = Depends(get_session)):
+def nuke_products(session: Session = Depends(get_session)):
     statement = select(Product)
     products = session.exec(statement).all()
-    session.delete(products)
-    session.commit()
-    session.refresh()
+
+    for product in products:
+        session.delete(product)
+        session.commit()
+    
     session.close()
+
+    return {"message": "All products have been deleted."}
