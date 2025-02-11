@@ -22,7 +22,7 @@ services:
 
   webshop:
     build: backend
-    #container_name: webshop-backend
+    container_name: webshop-backend
     working_dir: /backend/app
     ports:
       - "8000:8000"

@@ -3,7 +3,7 @@
     <h1>Product Catalog</h1>
     <div class="catalog-grid">
       <!-- Loop through products -->
-      <div v-for="product in products" :key="product.id" class="product-card">
+      <div v-for="product in products" :key="product.id" class="product-card" @click="openProductDetails(product.id)">
         <h3>{{ product.name }}</h3>
         <p class="product-category">{{ product.furniture_type }}</p>
         <p class="product-description">{{ product.product_type }}</p>
@@ -15,8 +15,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
-interface Product {
+export interface Product {
   id: number
   name: string
   base_price: number
@@ -46,6 +47,10 @@ onMounted(() => {
 
 function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`
+}
+
+function openProductDetails(id: number) {
+  useRouter().push(`/${id}`);
 }
 </script>
 
