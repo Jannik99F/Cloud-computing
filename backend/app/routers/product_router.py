@@ -39,33 +39,35 @@ def get_product_by_id(product_id: int, session: Session = Depends(get_session)):
 async def create_product(request: Request, session: Session = Depends(get_session)):
     product_data = await request.json()
 
-    base_price = product_data.get("base_price")
-    name = product_data.get("name")
-    furniture_type = product_data.get("furniture_type")
-    product_type = product_data.get("product_type")
-    height = product_data.get("height")
-    width = product_data.get("width")
-    depth = product_data.get("depth")
+    for product in product_data:
 
-    new_product = Product(
-        base_price=base_price,
-        name=name,
-        furniture_type=furniture_type,
-        product_type=product_type,
-        height=height,
-        width=width,
-        depth=depth,
-    )
-    session.add(new_product)
-    session.commit()
+        base_price = product.get("base_price")
+        name = product.get("name")
+        furniture_type = product.get("furniture_type")
+        product_type = product.get("product_type")
+        height = product.get("height")
+        width = product.get("width")
+        depth = product.get("depth")
 
-    session.refresh(new_product)
+        new_product = Product(
+            base_price=base_price,
+            name=name,
+            furniture_type=furniture_type,
+            product_type=product_type,
+            height=height,
+            width=width,
+            depth=depth,
+        )
+        session.add(new_product)
+        session.commit()
 
-    new_product =new_product.load_relations(relations_to_load=["variances"])
+        session.refresh(new_product)
+
+        new_product = new_product.load_relations(relations_to_load=["variances"])
 
     session.close()
 
-    return new_product
+    return str(len(product_data)) + " products were created successfully."
 
 @router.patch("/{product_id}")
 async def update_product(product_id: int, request: Request, session: Session = Depends(get_session)):
@@ -105,3 +107,12 @@ def delete_product(product_id: int, session: Session = Depends(get_session)):
     session.close()
 
     return {"message": "Product deleted successfully."}
+
+@router.delete("/")
+def delete_all_products(session: Session = Depends(get_session)):
+    statement = select(Product)
+    products = session.exec(statement).all()
+    session.delete(products)
+    session.commit()
+    session.refresh()
+    session.close()
