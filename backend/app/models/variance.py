@@ -11,3 +11,4 @@ class Variance(BaseModel, table=True):
     price: float
     product: "Product" = Relationship(back_populates="variances")
     basket_items: List["BasketItem"] = Relationship(back_populates="variance")
+    inventory: "Inventory" = Relationship(back_populates="variance")
