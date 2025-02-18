@@ -14,29 +14,19 @@
 </template>
 
 <script setup lang="ts">
+import type { Product } from '@/models/Product.vue';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-export interface Product {
-  id: number
-  name: string
-  base_price: number
-  furniture_type: string
-  product_type: string
-  height: number
-  width: number
-  depth: number
-  variances: any[]
-}
-
 const products = ref<Product[]>([])
+const router = useRouter();
 
 const fetchProducts = async () => {
   try {
     const response = await fetch('http://localhost:8000/products')
     products.value = await response.json()
   } catch (error) {
-    console.error('Error fetching products:',error)
+    console.error('Error fetching products:', error)
   }
 }
 
@@ -50,7 +40,7 @@ function formatPrice(price: number): string {
 }
 
 function openProductDetails(id: number) {
-  useRouter().push(`/${id}`);
+  router.push(`/catalog/${id}`)
 }
 </script>
 
