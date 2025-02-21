@@ -1,6 +1,8 @@
 <template>
   <div class="app">
+    <div class="navbar">
     <NavBar />
+  </div>
     <RouterView />
   </div>  
 </template>
@@ -16,7 +18,6 @@
   }
 
   .navbar {
-    border: 2px;
-    border-color: red;
+    padding: 1rem;
   }
 </style>
