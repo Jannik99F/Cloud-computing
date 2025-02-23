@@ -47,17 +47,27 @@ function openProductDetails(id: number) {
 <style scoped>
 .product-catalog {
   padding: 1rem;
+  width: max-content;
+  height: max-content;
 }
 .catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+  justify-content: flex-start;
 }
 .product-card {
+  flex: 1 1 calc(25% - 1rem);
+  max-width: calc(25% - 1rem);
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1rem;
   text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+.product-card:hover {
+  transform: scale(1.05);
 }
 .product-image {
   max-width: 100%;
