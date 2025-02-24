@@ -44,6 +44,7 @@ services:
   webshop-frontend:
     image: cloudcocos.azurecr.io/webshop-frontend:latest
     ports:
-      - "5173:5173"  # using the dev server for test
+      - "80:80"
     depends_on:
       - webshop-backend
+#
