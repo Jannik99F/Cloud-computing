@@ -3,7 +3,12 @@
     <h1>Product Catalog</h1>
     <div class="catalog-grid">
       <!-- Loop through products -->
-      <div v-for="product in products" :key="product.id" class="product-card" @click="openProductDetails(product.id)">
+      <div
+        v-for="product in products"
+        :key="product.id"
+        class="product-card"
+        @click="openProductDetails(product.id)"
+      >
         <h3>{{ product.name }}</h3>
         <p class="product-category">{{ product.furniture_type }}</p>
         <p class="product-description">{{ product.product_type }}</p>
@@ -31,14 +36,14 @@ export interface Product {
 
 const products = ref<Product[]>([])
 
-const API_HOST = import .meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const fetchProducts = async () => {
   try {
     const response = await fetch(`${API_HOST}/products`)
     products.value = await response.json()
   } catch (error) {
-    console.error('Error fetching products:',error)
+    console.error('Error fetching products:', error)
   }
 }
 
@@ -46,13 +51,12 @@ onMounted(() => {
   fetchProducts()
 })
 
-
 function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`
 }
 
 function openProductDetails(id: number) {
-  useRouter().push(`/${id}`);
+  useRouter().push(`/${id}`)
 }
 </script>
 
