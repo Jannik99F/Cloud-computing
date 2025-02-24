@@ -35,6 +35,10 @@ properties:
   - name: webshop-backend
     properties:
       image: cloudcocos.azurecr.io/webshop-backend:latest
+      command:
+       - "/bin/sh"
+       - "-c"
+       - "echo 'Waiting for DB to be ready...' && sleep 30 && echo 'Starting backend application...' && cd /backend/app && uvicorn app:app --host 0.0.0.0 --port 8000"
       resources:
         requests:
           cpu: 0.5
@@ -43,31 +47,29 @@ properties:
       - port: 8000
       environmentVariables:
       - name: DB_URL_PROD
-        value: "postgres://postgres:postgres@db:5432/shop"
+        value: "postgresql://postgres:postgres@localhost:5432/shop"
       - name: CELERY_BROKER_URL
-        value: "redis://redis:6379/0"
+        value: "redis://localhost:6379/0"
       - name: CELERY_RESULT_BACKEND
-        value: "redis://redis:6379/0"
+        value: "redis://localhost:6379/0"
   - name: celery-worker
     properties:
       image: cloudcocos.azurecr.io/celery-worker:latest
+      command:
+       - "/bin/sh"
+       - "-c"
+       - "echo 'Waiting for DB and Redis to be ready...' && sleep 45 && echo 'Starting celery worker' && celery -A tasks.celery_app worker --loglevel=info"
       resources:
         requests:
           cpu: 0.5
           memoryInGb: 1
-      command:
-      - "celery"
-      - "-A"
-      - "tasks.celery_app"
-      - "worker"
-      - "--loglevel=info"
       environmentVariables:
       - name: DB_URL_PROD
-        value: "postgres://postgres:postgres@db:5432/shop"
+        value: "postgresql://postgres:postgres@localhost:5432/shop"
       - name: CELERY_BROKER_URL
-        value: "redis://redis:6379/0"
+        value: "redis://localhost:6379/0"
       - name: CELERY_RESULT_BACKEND
-        value: "redis://redis:6379/0"
+        value: "redis://localhost:6379/0"
   - name: webshop-frontend
     properties:
       image: cloudcocos.azurecr.io/webshop-frontend:latest
