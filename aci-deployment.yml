@@ -5,6 +5,7 @@ properties:
   imageRegistryCredentials:
   - server: cloudcocos.azurecr.io
     username: CloudCocos
+    password: <password>
   containers:
   - name: db
     properties:
