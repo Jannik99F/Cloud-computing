@@ -31,9 +31,11 @@ export interface Product {
 
 const products = ref<Product[]>([])
 
+const API_HOST = import .meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://localhost:8000/products')
+    const response = await fetch(`${API_HOST}/products`)
     products.value = await response.json()
   } catch (error) {
     console.error('Error fetching products:',error)
