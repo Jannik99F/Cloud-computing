@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import type { Product } from '@/models/Product.vue';
+import { formatPrice } from '@/models/Product.vue';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -33,11 +34,6 @@ const fetchProducts = async () => {
 onMounted(() => {
   fetchProducts()
 })
-
-
-function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`
-}
 
 function openProductDetails(id: number) {
   router.push(`/catalog/${id}`)
@@ -82,6 +78,6 @@ function openProductDetails(id: number) {
 }
 .product-price {
   font-weight: bold;
-  color: #333;
+  color: #b4b2b2;
 }
 </style>

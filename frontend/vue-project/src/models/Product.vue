@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts">
 
 export interface Product {
     id: number
@@ -11,4 +11,6 @@ export interface Product {
     depth: number
     variances: any[]
 }
+
+export const formatPrice = (price: number): string => "$" + price.toFixed(2)
 </script>
