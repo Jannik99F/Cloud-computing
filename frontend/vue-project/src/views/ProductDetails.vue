@@ -50,6 +50,8 @@
     const variances = ref<Variance[]>()
     const inventory = ref<Inventory[]>()
 
+    const API_HOST = import.meta.env.VITE_API_URL || 'http:://localhost:8000'
+
     onMounted(async () => {
         console.log('Product details page mounted')
 
@@ -92,7 +94,7 @@
 
     const getProduct = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/products/${id}`)
+            const response = await fetch(`${API_HOST}/products/${id}`)
             product.value = await response.json()
         } catch (error) {
             console.error('Error fetching product with id ' + id, error)
@@ -101,7 +103,7 @@
 
     const getVariances = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:8000/products/${id}/variances`)
+            const response = await fetch(`${API_HOST}/${id}/variances`)
             variances.value = await response.json()
         } catch (error) {
             console.error('Error fetching variances for product with id ' + id, error)
@@ -118,7 +120,7 @@
 
         for(const variance of variances.value) {
             try {
-                const response = await fetch(`http://localhost:8000/inventory/${variance.id}`)
+                const response = await fetch(`${API_HOST}/inventory/${variance.id}`)
                 jsonResponses.push(await response.json())
             } catch (error) {
                 console.error('Error fetching inventory for variance with id ' + variance.id, error)
