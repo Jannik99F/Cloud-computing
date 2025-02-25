@@ -82,6 +82,7 @@ properties:
   osType: Linux
   ipAddress:
     type: Public
+    dnsNameLabel: webshop-group
     ports:
     - protocol: tcp
       port: 80
