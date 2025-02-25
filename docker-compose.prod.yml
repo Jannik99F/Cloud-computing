@@ -7,14 +7,14 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: shop
-    ports:
-      - "5432:5432"
+    #ports:
+      #- "5432:5432"
     # ports need to be removed in production
 
   redis:
     image: redis:latest
-    ports:
-      - "6379:6379"
+    #ports:
+    #  - "6379:6379"
     
 
   webshop-backend:
@@ -44,6 +44,7 @@ services:
   webshop-frontend:
     image: cloudcocos.azurecr.io/webshop-frontend:latest
     ports:
-      - "5173:5173"  # using the dev server for test
+      - "80:80"
     depends_on:
       - webshop-backend
+#
