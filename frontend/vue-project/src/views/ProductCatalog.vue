@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+
 import type { Product } from '@/models/Product.vue';
 import { formatPrice } from '@/models/Product.vue';
 import { ref, onMounted } from 'vue'
@@ -26,7 +27,6 @@ import { useRouter } from 'vue-router'
 
 const products = ref<Product[]>([])
 const router = useRouter();
-
 const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const fetchProducts = async () => {
