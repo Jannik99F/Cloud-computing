@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Product } from './ProductCatalog.vue'
+import type { Product } from '../views/ProductCatalog.vue'
 
 const route = useRoute()
 const product = ref<Product | null>(null)
