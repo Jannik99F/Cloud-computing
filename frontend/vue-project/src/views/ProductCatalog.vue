@@ -19,23 +19,14 @@
 </template>
 
 <script setup lang="ts">
+
+import type { Product } from '@/models/Product.vue';
+import { formatPrice } from '@/models/Product.vue';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-export interface Product {
-  id: number
-  name: string
-  base_price: number
-  furniture_type: string
-  product_type: string
-  height: number
-  width: number
-  depth: number
-  variances: any[]
-}
-
 const products = ref<Product[]>([])
-
+const router = useRouter();
 const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const fetchProducts = async () => {
@@ -57,29 +48,35 @@ onMounted(() => {
   fetchProducts()
 })
 
-function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`
-}
-
 function openProductDetails(id: number) {
-  useRouter().push(`/${id}`)
+  router.push(`/catalog/${id}`)
 }
 </script>
 
 <style scoped>
 .product-catalog {
   padding: 1rem;
+  width: max-content;
+  height: max-content;
 }
 .catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+  justify-content: flex-start;
 }
 .product-card {
+  flex: 1 1 calc(25% - 1rem);
+  max-width: calc(25% - 1rem);
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1rem;
   text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+.product-card:hover {
+  transform: scale(1.05);
 }
 .product-image {
   max-width: 100%;
@@ -94,6 +91,6 @@ function openProductDetails(id: number) {
 }
 .product-price {
   font-weight: bold;
-  color: #333;
+  color: #b4b2b2;
 }
 </style>
