@@ -1,9 +1,11 @@
 <template>
   <div class="app">
-    <div class="navbar">
-    <NavBar />
-  </div>
-    <RouterView />
+    <header class="navbar">
+      <NavBar />
+    </header>
+    <main class="content">
+      <RouterView />
+    </main>
   </div>  
 </template>
 
@@ -18,6 +20,14 @@
   }
 
   .navbar {
-    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
   }
+
+  .content {
+    margin-top: 40px;
+    padding: 20px;
+}
 </style>

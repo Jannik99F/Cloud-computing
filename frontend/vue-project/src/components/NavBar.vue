@@ -5,8 +5,8 @@
 <template>
   <nav>
     <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
     <RouterLink to="/catalog">Catalog</RouterLink>
+    <RouterLink to="/about">About</RouterLink>
   </nav>  
 </template>
 
@@ -20,7 +20,6 @@ nav {
   width: 100%;
   font-size: 18px;
   text-align: center;
-  margin-top: 2rem;
 }
 
 nav a.router-link-exact-active {
