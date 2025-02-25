@@ -1,0 +1,91 @@
+apiVersion: 2019-12-01
+location: germanywestcentral
+name: webshop-group
+properties:
+  imageRegistryCredentials:
+  - server: cloudcocos.azurecr.io
+    username: CloudCocos
+    password: <password>
+  containers:
+  - name: db
+    properties:
+      image: cloudcocos.azurecr.io/postgres:latest
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1.5
+      environmentVariables:
+      - name: POSTGRES_USER
+        value: "postgres"
+      - name: POSTGRES_PASSWORD
+        value: "postgres"
+      - name: POSTGRES_DB
+        value: "shop"
+      ports:
+      - port: 5432
+  - name: redis
+    properties:
+      image: cloudcocos.azurecr.io/redis:latest
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 6379
+  - name: webshop-backend
+    properties:
+      image: cloudcocos.azurecr.io/webshop-backend:latest
+      command:
+       - "/bin/sh"
+       - "-c"
+       - "echo 'Waiting for DB to be ready...' && sleep 30 && echo 'Starting backend application...' && cd /backend/app && uvicorn app:app --host 0.0.0.0 --port 8000"
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1
+      ports:
+      - port: 8000
+      environmentVariables:
+      - name: DB_URL_PROD
+        value: "postgresql://postgres:postgres@localhost:5432/shop"
+      - name: CELERY_BROKER_URL
+        value: "redis://localhost:6379/0"
+      - name: CELERY_RESULT_BACKEND
+        value: "redis://localhost:6379/0"
+  - name: celery-worker
+    properties:
+      image: cloudcocos.azurecr.io/celery-worker:latest
+      command:
+       - "/bin/sh"
+       - "-c"
+       - "echo 'Waiting for DB and Redis to be ready...' && sleep 45 && echo 'Starting celery worker' && celery -A tasks.celery_app worker --loglevel=info"
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 1
+      environmentVariables:
+      - name: DB_URL_PROD
+        value: "postgresql://postgres:postgres@localhost:5432/shop"
+      - name: CELERY_BROKER_URL
+        value: "redis://localhost:6379/0"
+      - name: CELERY_RESULT_BACKEND
+        value: "redis://localhost:6379/0"
+  - name: webshop-frontend
+    properties:
+      image: cloudcocos.azurecr.io/webshop-frontend:latest
+      resources:
+        requests:
+          cpu: 0.5
+          memoryInGb: 0.5
+      ports:
+      - port: 80
+  osType: Linux
+  ipAddress:
+    type: Public
+    dnsNameLabel: webshop-group
+    ports:
+    - protocol: tcp
+      port: 80
+    - protocol: tcp
+      port: 8000
+  restartPolicy: OnFailure

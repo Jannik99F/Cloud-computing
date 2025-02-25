@@ -25,11 +25,12 @@ const router = createRouter({
       name: 'catalog',
       component: ProductCatalog,
     },
+
     {
       path: '/catalog/:id',
       name: 'product',
       component: ProductDetails,
-    }
+    },
   ],
 })
 

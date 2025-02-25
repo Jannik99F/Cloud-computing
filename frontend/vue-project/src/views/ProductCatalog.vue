@@ -3,7 +3,12 @@
     <h1>Product Catalog</h1>
     <div class="catalog-grid">
       <!-- Loop through products -->
-      <div v-for="product in products" :key="product.id" class="product-card" @click="openProductDetails(product.id)">
+      <div
+        v-for="product in products"
+        :key="product.id"
+        class="product-card"
+        @click="openProductDetails(product.id)"
+      >
         <h3>{{ product.name }}</h3>
         <p class="product-category">{{ product.furniture_type }}</p>
         <p class="product-description">{{ product.product_type }}</p>
@@ -22,10 +27,18 @@ import { useRouter } from 'vue-router'
 const products = ref<Product[]>([])
 const router = useRouter();
 
+const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://localhost:8000/products')
-    products.value = await response.json()
+    const response = await fetch(`${API_HOST}/products`)
+    if (response.ok) {
+      const data = await response.json()
+      products.value = data
+      console.log('Successfully fetched products:', data)
+    } else {
+      console.error('Failed to fetch products, status:', response.status)
+    }
   } catch (error) {
     console.error('Error fetching products:', error)
   }
