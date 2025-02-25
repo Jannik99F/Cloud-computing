@@ -41,7 +41,13 @@ const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const fetchProducts = async () => {
   try {
     const response = await fetch(`${API_HOST}/products`)
-    products.value = await response.json()
+    if (response.ok) {
+      const data = await response.json()
+      products.value = data
+      console.log('Successfully fetched products:', data)
+    } else {
+      console.error('Failed to fetch products, status:', response.status)
+    }
   } catch (error) {
     console.error('Error fetching products:', error)
   }
