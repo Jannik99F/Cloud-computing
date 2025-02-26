@@ -1,5 +1,11 @@
+from backend.app.models.order import Order
+from backend.app.routers.user_basket_router import get_current_basket
 from sqlmodel import Session, SQLModel, select
 from models.user import User
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from db.engine import DatabaseManager, get_session
 
@@ -175,3 +181,20 @@ async def checkout(session: Session = Depends(get_session), user_id: int = Query
     # TODO: A confirmation mail needs to be send.
 
     return order
+
+def send_confirmation(order: Order, user_id: int):
+    SMTP_SERVER = "smtp.gmail.com"
+    SMTP_PORT = 587
+    EMAIL_ADDRESS = "lowtechfurniture@gmail.com"
+    EMAIL_PASSWORD = "lowtechisthebest"
+
+    basket = get_current_basket(user_id)
+
+    subject = "Thank you for order #" + order.id + "!"
+    body = "Hello! Thank you for ordering:"
+
+    # for(item in basket.basket_items) {
+    #     body += 
+    # }
+
+    return
