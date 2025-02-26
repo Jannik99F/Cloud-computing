@@ -1,5 +1,3 @@
-<script setup lang="ts">
-
 export interface User {
     id: number
     first_name: string
@@ -9,4 +7,3 @@ export interface User {
     address: string
     baskets: any[]
 }
-</script>
