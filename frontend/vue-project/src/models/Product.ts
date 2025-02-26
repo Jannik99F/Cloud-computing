@@ -1,5 +1,3 @@
-<script lang="ts">
-
 export interface Product {
     id: number
     name: string
@@ -13,4 +11,3 @@ export interface Product {
 }
 
 export const formatPrice = (price: number): string => "$" + price.toFixed(2)
-</script>

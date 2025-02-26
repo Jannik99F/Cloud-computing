@@ -21,8 +21,6 @@
             </div>
             <div class="variance-box">
                 <div v-for="variance in variances" :key="variance.id" class="variance-item">
-                    <p>{{ JSON.stringify(variance) }}</p>
-                    <br>
                     <div :style="{ backgroundColor: variance.name }"></div>
                     <p>{{ variance.name }}</p>
                     <p>{{ formatPrice(variance.price*product.base_price) }}</p>
@@ -37,11 +35,11 @@
 
 <script setup lang="ts">
 
-    import type { Product } from '@/models/Product.vue';
-    import { formatPrice } from '@/models/Product.vue';
-    import type { Variance } from '@/models/Variance.vue';
-    import type { Inventory } from '@/models/Inventory.vue';
-    import { onMounted, ref, toRaw } from 'vue';
+    import type { Product } from '@/models/Product';
+    import { formatPrice } from '@/models/Product';
+    import type { Variance } from '@/models/Variance';
+    import type { Inventory } from '@/models/Inventory';
+    import { onMounted, ref } from 'vue';
     import { useRoute } from 'vue-router';
 
     const ready = ref(false) // Only show template when ready is true
@@ -50,7 +48,8 @@
     const variances = ref<Variance[]>()
     const inventory = ref<Inventory[]>()
 
-    const API_HOST = import.meta.env.VITE_API_URL || 'http:://localhost:8000'
+    const API_HOST = "http://localhost:8000"
+    // const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
     onMounted(async () => {
         console.log('Product details page mounted')
@@ -65,27 +64,25 @@
     })
 
     const getAmount = (variance_id: number) => {
-        console.log("Getting inventory for variance with id ", variance_id)
+        let amount = 0
 
         if(inventory.value == undefined) {
-            console.log("inventory undefined")
-            return 0;
-        }
-
-        for(const item of inventory.value) {
-            console.log("Checking item: ", item)
-            const rawItem = toRaw(item)
-            console.log("Raw item: ", rawItem)
-            console.log("Item id: ", rawItem.id)
-            if(item.variance_id == variance_id) {
-                return rawItem.amount
-            }
-            return 0;
+            console.log("Inventory undefined")
+            return 0
         }
 
         inventory.value.forEach((item) => {
-            
-        })
+            // Even if this is showing errors, this part is vital. 
+            // Each item object is wrapped in an array of length one, 
+            // so we need to access the first element to make it work.
+            // @ts-ignore
+            item = item['0']   // ?????????????? what the fuck vue ??????????????
+            if(item.variance_id == variance_id) {
+                amount = item.amount
+            }
+        });
+
+        return amount
     }
 
     /**
@@ -103,7 +100,7 @@
 
     const getVariances = async (id: string) => {
         try {
-            const response = await fetch(`${API_HOST}/${id}/variances`)
+            const response = await fetch(`${API_HOST}/products/${id}/variances`)
             variances.value = await response.json()
         } catch (error) {
             console.error('Error fetching variances for product with id ' + id, error)
@@ -128,7 +125,6 @@
         }
 
         inventory.value = jsonResponses;
-        console.log("Inventory: ", inventory.value)
     }
 </script>
 

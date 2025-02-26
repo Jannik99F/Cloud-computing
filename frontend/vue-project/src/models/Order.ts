@@ -1,5 +1,3 @@
-<script lang="ts">
-
 export interface Order {
     id: number
     shipping_address: string | null
@@ -11,5 +9,3 @@ export interface Order {
     status: string
     basket_id: number
 }
-
-</script>
