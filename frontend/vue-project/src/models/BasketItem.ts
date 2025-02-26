@@ -1,5 +1,3 @@
-<script lang="ts">
-
 export interface BasketItem {
     id: number
     variance_id: number
@@ -8,5 +6,3 @@ export interface BasketItem {
     base_price: number | null
     variance_price: number | null
 }
-
-</script>

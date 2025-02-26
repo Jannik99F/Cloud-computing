@@ -1,5 +1,3 @@
-<script lang="ts">
-
 export interface Variance {
     id: number
     product_id: number
@@ -7,5 +5,3 @@ export interface Variance {
     variance_type: string
     price: number
 }
-
-</script>
