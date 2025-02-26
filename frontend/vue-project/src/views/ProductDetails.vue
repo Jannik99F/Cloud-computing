@@ -48,8 +48,8 @@
     const variances = ref<Variance[]>()
     const inventory = ref<Inventory[]>()
 
-    const API_HOST = "http://localhost:8000"
-    // const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+    // const API_HOST = "http://localhost:8000"
+    const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
     onMounted(async () => {
         console.log('Product details page mounted')
