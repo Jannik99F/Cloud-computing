@@ -1,8 +1,8 @@
 <template>
     <div>
-        <h2>Login</h2>
+        <h2>Please enter your E-Mail address and password</h2>
 
-        <Form @submit="login">
+        <Form @submit="login" class="login-form">
             <div>
                 <label>E-Mail Address</label>
                 <Field name="email" :rules="isEmpty" v-model="form.email" class="input" />
@@ -15,7 +15,7 @@
                 <ErrorMessage name="password" class="error" />
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit" class="login-button">Login</button>
         </Form>
     </div>
 </template>
@@ -74,11 +74,36 @@
 </script>
 
 <style scoped>
-    .input {
-        width: 100%;
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .login-form div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .login-form input {
+        width: 50%;
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
+    }
+    .login-form button {
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        width: fit-content;
+        margin-top: 8px;
+        padding: 8px;
+        font-size: 16px;
+        color: var(--color-text);
+    }
+    .login-form button:hover {
+        transform: scale(1.05);
     }
 
     .error {

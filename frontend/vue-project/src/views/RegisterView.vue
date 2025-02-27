@@ -1,35 +1,35 @@
 <template>
     <div>
-        <h2>Register</h2>
+        <h2>Please enter your info to create an account</h2>
 
-        <Form @submit="register">
+        <Form @submit="register" class="register-form">
             <div>
                 <label>First Name</label>
-                <Field name="firstName" :rules="isEmpty" v-model="form.first_name" class="input" />
+                <Field name="firstName" :rules="isEmpty" v-model="form.first_name" />
                 <ErrorMessage name="firstName" class="error" />
             </div>
 
             <div>
                 <label>Last Name</label>
-                <Field name="lastName" :rules="isEmpty" v-model="form.last_name" class="input" />
+                <Field name="lastName" :rules="isEmpty" v-model="form.last_name" />
                 <ErrorMessage name="lastName" class="error" />
             </div>
 
             <div>
                 <label>Email</label>
-                <Field name="email" :rules="isEmpty" v-model="form.email" class="input" />
+                <Field name="email" :rules="isEmpty" v-model="form.email" />
                 <ErrorMessage name="email" class="error" />
             </div>
 
             <div>
                 <label>Password</label>
-                <Field name="password" :rules="isEmpty" type="password" v-model="form.password" class="input" />
+                <Field name="password" :rules="isEmpty" type="password" v-model="form.password" />
                 <ErrorMessage name="password" class="error" />
             </div>
 
             <div>
                 <label>Address</label>
-                <Field name="address" :rules="isEmpty" v-model="form.address" class="input" />
+                <Field name="address" :rules="isEmpty" v-model="form.address" />
                 <ErrorMessage name="address" class="error" />
             </div>
 
@@ -93,11 +93,36 @@
 </script>
 
 <style scoped>
-    .input {
-        width: 100%;
+    .register-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .register-form div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .register-form input {
+        width: 50%;
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
+    }
+    .register-form button {
+        background: transparent;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        width: fit-content;
+        margin-top: 8px;
+        padding: 8px;
+        font-size: 16px;
+        color: var(--color-text);
+    }
+    .register-form button:hover {
+        transform: scale(1.05);
     }
 
     .error {

@@ -132,7 +132,7 @@
     }
 
     .product-header {
-        color: white;
+        color: var(--color-text)
     }
 
     .variance-box {
@@ -147,17 +147,15 @@
         padding: 10px;
         gap: 5px;
     }
-
     .variance-item div {
         width: 36px;
         height: 36px;
         background-color: #ddd;
-        border: 2px solid #aaa;
+        opacity: 90%;
+        border: 2px solid #ddd;
         border-radius: 30%;
     }
-
     .variance-item p {
         font-size: medium;
     }
-
 </style>
