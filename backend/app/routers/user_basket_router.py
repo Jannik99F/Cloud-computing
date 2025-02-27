@@ -4,6 +4,7 @@ from models.variance import Variance
 from models.basket_item import BasketItem
 from models.basket import Basket
 from models.order import Order
+from models.product import Product
 
 from db.engine import DatabaseManager, get_session
 
@@ -82,12 +83,16 @@ async def add_item_to_current_basket(request: Request, session: Session = Depend
     if session.exec(statement).first() is not None:
         raise HTTPException(status_code=400, detail="A BasketItem with for this variance already exists.")
 
+    statement = (select(Product)
+                 .where(Variance.product_id == variance.product_id))
+    product = session.exec(statement).first()
+
     basket_item = BasketItem(
         basket_id=basket.id,
         variance_id=variance_id,
         amount=amount,
-        base_price=None,
-        variance_price=None
+        base_price=product.base_price,
+        variance_price=variance.price
     )
     session.add(basket_item)
     session.commit()

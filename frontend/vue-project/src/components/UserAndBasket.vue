@@ -4,7 +4,6 @@
         <RouterLink to="/logout">Logout</RouterLink>
     </nav>
     <nav v-else>
-        <RouterLink to="/basket">Basket</RouterLink>
         <RouterLink to="/register">Register</RouterLink>
         <RouterLink to="/login">Login</RouterLink>
     </nav>
