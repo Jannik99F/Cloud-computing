@@ -1,3 +1,5 @@
+import type { Basket } from "./Basket"
+
 export interface User {
     id: number
     first_name: string
@@ -5,5 +7,5 @@ export interface User {
     email: string
     password: string
     address: string
-    baskets: any[]
+    baskets: Basket[]
 }

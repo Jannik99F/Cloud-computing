@@ -1,15 +1,11 @@
 <template v-if="ready">
     <div id="product-details" v-if="ready">
         <!-- If product couldn't be retrieved -->
-        <div v-if="(product instanceof Error)">
-            <p>{{ product.message }}</p>
-            <p>Test</p>
+        <div v-if="product == undefined">
+            <p>Could not retrieve product information.</p>
         </div>
 
-        <div v-else-if="product && !(product instanceof Error) 
-                    && variances && !(variances instanceof Error)
-                    && inventory && !(inventory instanceof Error)" 
-                    class="product-box">
+        <div v-else>
             <h1 class="product-header">{{ product.name }}</h1>
             <p>{{ product.product_type }}</p>
             <p>{{ product.height }}x{{ product.width }}x{{ product.depth }}cm</p>
@@ -67,7 +63,6 @@
         let amount = 0
 
         if(inventory.value == undefined) {
-            console.log("Inventory undefined")
             return 0
         }
 
