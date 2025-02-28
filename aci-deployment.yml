@@ -58,7 +58,7 @@ properties:
       command:
        - "/bin/sh"
        - "-c"
-       - "echo 'Waiting for DB and Redis to be ready...' && sleep 45 && echo 'Starting celery worker' && celery -A tasks.celery_app worker --loglevel=info"
+       - "echo 'CELERY DEBUG: Starting debug...' && pwd && ls -la && echo 'ENV:' && env && echo 'Waiting for DB and Redis...' && sleep 45 && echo 'Testing Redis connection...' && python -c \"import redis; client = redis.Redis(host='localhost', port=6379); print('PING Redis:', client.ping())\" && echo 'Starting celery worker...' && cd /backend/app && celery -A tasks.celery_app worker --loglevel=debug"
       resources:
         requests:
           cpu: 0.5
