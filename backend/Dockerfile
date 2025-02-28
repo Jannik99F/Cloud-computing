@@ -1,10 +1,17 @@
 FROM python:3.10-slim
 
-WORKDIR /backend/app
+WORKDIR /backend
 
-RUN pip install --no-cache-dir fastapi uvicorn psycopg2-binary alembic sqlmodel python-dotenv celery redis
+RUN pip install --no-cache-dir fastapi uvicorn psycopg2-binary alembic sqlmodel python-dotenv celery redis azure-storage-blob python-multipart
 
+# Copy alembic files
+COPY ./alembic /backend/alembic
+COPY ./alembic.ini /backend/alembic.ini
+
+# Copy application files
 COPY ./app /backend/app
+
+WORKDIR /backend/app
 
 EXPOSE 8000
 
