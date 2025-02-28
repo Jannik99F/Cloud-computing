@@ -9,6 +9,17 @@
         class="product-card"
         @click="openProductDetails(product.id)"
       >
+        <div class="product-image-container">
+          <img
+            v-if="product.image_url"
+            :src="product.image_url"
+            :alt="product.name"
+            class="product-image"
+          />
+          <div v-else class="product-image-placeholder">
+            <span>No image</span>
+          </div>
+        </div>
         <h3>{{ product.name }}</h3>
         <p class="product-category">{{ product.furniture_type }}</p>
         <p class="product-description">{{ product.product_type }}</p>
@@ -80,9 +91,33 @@ function openProductDetails(id: number) {
 .product-card:hover {
   transform: scale(1.05);
 }
+.product-image-container {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+}
+
 .product-image {
   max-width: 100%;
-  height: auto;
+  max-height: 150px;
+  object-fit: contain;
+}
+
+.product-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  color: #777;
+  font-style: italic;
 }
 .product-category {
   font-style: italic;
