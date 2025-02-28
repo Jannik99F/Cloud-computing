@@ -14,10 +14,16 @@
             <p>{{ product.product_type }}</p>
             <p>{{ product.height }}x{{ product.width }}x{{ product.depth }}cm</p>
             <div id="product-image">
-                <!-- 
-                    TODO
-                    Put product images between product details and variances
-                -->
+                <div v-if="product.image_url" class="product-image-container">
+                    <img 
+                        :src="product.image_url" 
+                        :alt="product.name" 
+                        class="product-image" 
+                    />
+                </div>
+                <div v-else class="product-image-placeholder">
+                    <span>No image available</span>
+                </div>
             </div>
             <div class="variance-box">
                 <div v-for="variance in variances" :key="variance.id" class="variance-item">
@@ -163,6 +169,39 @@
 
     .variance-item p {
         font-size: medium;
+    }
+
+    .product-image-container {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem 0;
+        overflow: hidden;
+        border-radius: 8px;
+        background-color: #f5f5f5;
+    }
+
+    .product-image {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+    }
+
+    .product-image-placeholder {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e0e0e0;
+        color: #777;
+        font-style: italic;
+        margin: 1rem 0;
+        border-radius: 8px;
     }
 
 </style>
