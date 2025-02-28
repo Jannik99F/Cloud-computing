@@ -43,7 +43,7 @@ def check_existing_order_must_be_deleted(basket: Basket ,session: Session):
         session.delete(order)
         session.commit()
 
-@router.put("/")
+@router.put("")
 def get_current_basket(session: Session = Depends(get_session), user_id: int = Query(..., description="The ID of the user whose basket is requested")):
     user = User.get_user(user_id)
 
