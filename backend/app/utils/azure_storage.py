@@ -5,6 +5,7 @@ import uuid
 class AzureBlobStorage:
     def __init__(self):
         # Azure Blob Storage connection string
+        connection_string = ""
         self.blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         self.container_name = "furniture-images"
         
