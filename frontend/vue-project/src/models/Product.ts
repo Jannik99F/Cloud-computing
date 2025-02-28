@@ -7,6 +7,7 @@ export interface Product {
     height: number
     width: number
     depth: number
+    image_url?: string
     variances: any[]
 }
 
