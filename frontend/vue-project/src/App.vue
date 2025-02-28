@@ -1,20 +1,26 @@
 <template>
   <div class="app">
-    <header class="navbar">
-      <NavBar />
-    </header>
-    <header class="user-and-basket-bar">
-      <UserAndBasket />
-    </header>
+    <div class="headers">
+      <header class="navbar">
+        <NavBar />
+      </header>
+      <header class="login-info">
+        <LoginInfo />
+      </header>
+      <header class="user-and-basket-bar">
+        <UserAndBasket />
+      </header>
+    </div>
     <main class="content">
       <RouterView />
     </main>
-  </div>  
+  </div>
 </template>
 
 <script setup lang="ts">
   import NavBar from './components/NavBar.vue';
-import UserAndBasket from './components/UserAndBasket.vue';
+  import UserAndBasket from './components/UserAndBasket.vue';
+  import LoginInfo from './components/LoginInfo.vue';
 </script>
 
 <style>
@@ -23,11 +29,31 @@ import UserAndBasket from './components/UserAndBasket.vue';
     flex-direction: column;
   }
 
-  .navbar {
+  .headers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
     top: 0;
+    width: 100%;
+    padding: 30px;
+  }
+
+  .navbar {
+    position: fixed;
     left: 0;
-    padding: 20px;
+  }
+
+  .login-info {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .user-and-basket-bar {
+    position: fixed;
+    right: 0;
   }
 
   .user-and-basket-bar {

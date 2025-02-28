@@ -1,10 +1,9 @@
 <template>
     <nav v-if="(isUserLoggedIn())">
         <RouterLink to="/basket">Basket</RouterLink>
-        <RouterLink to="/user">User</RouterLink>
+        <RouterLink to="/logout">Logout</RouterLink>
     </nav>
     <nav v-else>
-        <RouterLink to="/basket">Basket</RouterLink>
         <RouterLink to="/register">Register</RouterLink>
         <RouterLink to="/login">Login</RouterLink>
     </nav>
@@ -13,11 +12,7 @@
 
 <script setup lang="ts">
   import { RouterLink } from 'vue-router'
-
-  const isUserLoggedIn = () => {
-    return true
-  }
-
+  import { isUserLoggedIn } from '@/stores/auth';
 </script>
 
 

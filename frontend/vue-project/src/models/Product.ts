@@ -1,3 +1,5 @@
+import type { Variance } from "./Variance"
+
 export interface Product {
     id: number
     name: string
@@ -7,7 +9,7 @@ export interface Product {
     height: number
     width: number
     depth: number
-    variances: any[]
+    variances: Variance[]
 }
 
 export const formatPrice = (price: number): string => "$" + price.toFixed(2)

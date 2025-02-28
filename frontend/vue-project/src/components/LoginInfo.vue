@@ -1,16 +1,18 @@
-<script setup lang="ts">
-  import { RouterLink } from 'vue-router'
-</script>
-
 <template>
-  <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/catalog">Catalog</RouterLink>
-    <!-- <RouterLink to="/about">About</RouterLink> -->
-  </nav>  
+    <p v-if="(isUserLoggedIn())">Logged in as {{ auth.user?.email }}</p>
+    <p v-else>Not logged in. Please register or login to make a purchase.</p>
 </template>
 
+<script setup lang="ts">
+import { isUserLoggedIn, useAuthStore } from '@/stores/auth';
+const auth = useAuthStore()
+</script>
+
 <style scoped>
+p {
+  font-size: 18px;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
