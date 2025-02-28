@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import pool, MetaData
 from alembic import context
 import os
 from dotenv import load_dotenv
@@ -16,10 +16,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = SQLModel.metadata
-target_metadata = SQLModel.metadata
+# We are using raw SQL in our migrations, so no metadata needed
+target_metadata = None
 
 # Load the DATABASE_URL from environment variables.
 DATABASE_URL = database_url = os.getenv("DB_URL_LOCAL") if os.getenv("DEBUG") == "true" else os.getenv("DB_URL_PROD")
