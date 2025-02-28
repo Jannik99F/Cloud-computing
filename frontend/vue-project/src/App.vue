@@ -56,6 +56,13 @@
     right: 0;
   }
 
+  .user-and-basket-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 20px;
+  }
+
   .content {
     margin-top: 40px;
     padding: 20px;

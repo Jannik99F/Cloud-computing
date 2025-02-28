@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   db:
@@ -18,6 +17,9 @@ services:
     
 
   webshop-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: cloudcocos.azurecr.io/webshop-backend:latest  
     ports:
       - "8000:8000"
@@ -30,6 +32,9 @@ services:
       - redis
 
   celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: cloudcocos.azurecr.io/celery-worker:latest
     command: ["celery", "-A", "tasks.celery_app", "worker", "--loglevel=info"]
     environment:
@@ -42,6 +47,11 @@ services:
       - webshop-backend
 
   webshop-frontend:
+    build:
+      context: ./frontend/vue-project
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: "http://webshop-group.germanywestcentral.azurecontainer.io:8000"
     image: cloudcocos.azurecr.io/webshop-frontend:latest
     ports:
       - "80:80"
