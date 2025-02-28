@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    # Execute raw SQL to add the image_url column
+    # SQL to add the image_url
     op.execute("""
     ALTER TABLE product 
     ADD COLUMN image_url VARCHAR NULL;
@@ -25,7 +25,7 @@ def upgrade():
 
 
 def downgrade():
-    # Execute raw SQL to drop the image_url column
+    # SQL to drop the image_url
     op.execute("""
     ALTER TABLE product 
     DROP COLUMN image_url;
