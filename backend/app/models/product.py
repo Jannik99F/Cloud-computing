@@ -1,5 +1,5 @@
 from sqlmodel import Field, SQLModel, Relationship
-from typing import List
+from typing import List, Optional
 from models.base_model import BaseModel
 
 class Product(BaseModel, table=True):
@@ -11,4 +11,5 @@ class Product(BaseModel, table=True):
     height: float
     width: float
     depth: float
+    image_url: Optional[str] = None
     variances: List["Variance"] = Relationship(back_populates="product", cascade_delete=True)
