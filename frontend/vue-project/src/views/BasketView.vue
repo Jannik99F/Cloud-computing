@@ -1,39 +1,37 @@
 <template>
-    <div :key="key" class="basket">
-        <h1>Your Basket</h1>
-        <div v-if="basket != undefined"> 
-            <div v-for="item of superBasket" class="basket-item">
-                <div class="item-picture" style="border: none">
-                    <!-- Put thumbnail of the picture here -->
-                </div>
-                <div>
-                    <b>{{ item.product_name }}</b>
-                    <p>in</p>
-                    <p :style="{color: item.variance_name}">{{ item.variance_name }}</p>
-                </div>
-                <div>
-                    <b>Dimensions:</b>
-                    <p>{{ item.height }}x{{ item.height }}x{{ item.height }}cm</p>
-                </div>
-                <div style="border: none">
-                    <b>Price:</b>
-                    <p v-if="!(item.base_price == null) && !(item.variance_price == null)">{{formatPrice(item.base_price*item.variance_price)}}</p>
-                    <p v-else>Price not available</p>
-                </div>
-                <button class="button" style="background-color: red; transparent: 60%" @click="removeItem(item.basket_item_id, basket.user_id)">
-                    Remove Item
-                </button>
+    <h1>Your Basket</h1>
+    <div v-if="basket != undefined"> 
+        <div :key="key" v-for="item of superBasket" class="basket-item">
+            <div class="item-picture" style="border: none">
+                <!-- Put thumbnail of the picture here -->
             </div>
-            <div style="text-align: right">
-                <h2>Total price: {{ formatPrice(getPriceOfBasket()) }}</h2>
+            <div>
+                <b>{{ item.product_name }}</b>
+                <p>in</p>
+                <p :style="{color: item.variance_name}">{{ item.variance_name }}</p>
             </div>
-            <button class="button" @click="checkout()">
-                Checkout
+            <div>
+                <b>Dimensions:</b>
+                <p>{{ item.height }}x{{ item.height }}x{{ item.height }}cm</p>
+            </div>
+            <div style="border: none">
+                <b>Price:</b>
+                <p v-if="!(item.base_price == null) && !(item.variance_price == null)">{{formatPrice(item.base_price*item.variance_price)}}</p>
+                <p v-else>Price not available</p>
+            </div>
+            <button class="button" style="background-color: red; transparent: 60%" @click="removeItem(item.basket_item_id, basket.user_id)">
+                Remove Item
             </button>
         </div>
-        <div v-else>
-            Basket could not be retrieved. Please try again.
+        <div style="text-align: right">
+            <h2>Total price: {{ formatPrice(getPriceOfBasket()) }}</h2>
         </div>
+        <button class="button" @click="checkout()">
+            Checkout
+        </button>
+    </div>
+    <div v-else>
+        Basket could not be retrieved. Please try again.
     </div>
 </template>
 
@@ -41,7 +39,7 @@
     import type { Basket } from '@/models/Basket';
     import type { Variance } from '@/models/Variance';
     import { useAuthStore } from '@/stores/auth';
-    import { onMounted, ref } from 'vue';
+    import { getCurrentInstance, nextTick, onMounted, ref } from 'vue';
     import { formatPrice, type Product } from '@/models/Product';
     import { useRouter } from 'vue-router';
 
@@ -91,8 +89,11 @@
         await fetchVariances()
         await getVariances()
         await constructSuperBasket()
+    }
 
-        key.value++
+    const forceRerender = () => {
+        fetchMethods()
+        key.value += 1
     }
 
     const removeItem = async (basket_item_id: number, user_id: number) => {
@@ -104,7 +105,8 @@
             console.error("Item could not be removed.", error)
         }
 
-        fetchMethods()
+        console.log("Hello")
+        forceRerender()
     }
 
     const checkout = () => {
@@ -227,6 +229,8 @@
         } catch (error) {
             console.error("Basket could not be retrieved.", error)   
         }
+
+        console.log("Got basket: " + JSON.stringify(basket.value))
     }
 
     const getVariances = async () => {
