@@ -56,42 +56,63 @@ function openProductDetails(id: number) {
 
 <style scoped>
 .product-catalog {
-  padding: 1rem;
-  width: max-content;
-  height: max-content;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
+
 .catalog-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: flex-start;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
 }
+
 .product-card {
-  flex: 1 1 calc(25% - 1rem);
-  max-width: calc(25% - 1rem);
+  flex: 0 0 250px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 1.5rem;
   text-align: center;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  background-color: rgba(40, 40, 40, 0.5);
   transition: transform 0.2s ease-in-out;
 }
+
 .product-card:hover {
   transform: scale(1.05);
 }
+
 .product-image {
   max-width: 100%;
   height: auto;
 }
+
 .product-category {
   font-style: italic;
   color: #777;
+  margin-top: 0.5rem;
 }
+
 .product-description {
   margin: 0.5rem 0;
 }
+
 .product-price {
   font-weight: bold;
-  color: #b4b2b2;
+  color: #e0e0e0;
+  margin-top: auto;
+  font-size: 1.2rem;
+  padding-top: 0.5rem;
+}
+
+h1 {
+  text-align: center;
 }
 </style>
