@@ -1,5 +1,5 @@
 from sqlmodel import Session
-from db.engine import engine, DatabaseManager
+from db.engine import DatabaseManager
 from models.product import Product
 from models.variance import Variance
 from models.inventory import Inventory
@@ -9,6 +9,8 @@ def init_db():
     """Initialize the database with sample products, variances, inventory, and a test user."""
     # Ensure DB tables are created
     DatabaseManager.initialize()
+
+    engine = DatabaseManager.get_engine()
     
     with Session(engine) as session:
         # Check if the product already exists
