@@ -12,7 +12,7 @@
       </header>
     </div>
     <main class="content">
-      <RouterView />
+      <RouterView style="align-self: center"/>
     </main>
   </div>
 </template>
@@ -66,5 +66,5 @@
   .content {
     margin-top: 40px;
     padding: 20px;
-}
+  }
 </style>

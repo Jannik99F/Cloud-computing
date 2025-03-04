@@ -28,7 +28,6 @@ import { useRouter } from 'vue-router'
 const products = ref<Product[]>([])
 const router = useRouter();
 
-// const API_HOST = 'http://localhost:8000'
 const API_HOST = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const fetchProducts = async () => {

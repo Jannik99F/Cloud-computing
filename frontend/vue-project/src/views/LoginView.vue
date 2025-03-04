@@ -11,7 +11,7 @@
 
             <div>
                 <label>Password</label>
-                <Field name="password" :rules="isEmpty" v-model="form.password" class="input" />
+                <Field name="password" :rules="isEmpty" v-model="form.password" class="input" type="password" />
                 <ErrorMessage name="password" class="error" />
             </div>
 
